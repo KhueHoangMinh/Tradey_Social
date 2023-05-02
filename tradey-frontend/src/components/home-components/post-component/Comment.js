@@ -109,6 +109,7 @@ function Comment(props) {
                                     handleComment = {handleShowCmtComment}
                                     comments = {props.comment.comments}
                                     openning = {showCmtComments}
+                                    text = 'reply'
                                 />
                             </div>
                             {showCmtComments && 

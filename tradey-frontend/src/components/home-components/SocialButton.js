@@ -54,11 +54,14 @@ function CommentButton(props) {
 
         return total
     }
+
+
+
     return (
         <ReactButtonStyle>
             <button onClick={()=>props.handleComment()} className={`comment ${props.openning ? `openning`:``}`}>
                 <img src='/images/comment.svg' alt=''/>
-                <span>{calcCmtQuant(props.comments)} Comment{props.comments.length > 1 ? 's':''}</span>
+                <span>{calcCmtQuant(props.comments)} {props.text != 'reply' ? (<>{props.text}{props.comments.length > 1 ? 's':''}</>):(<>{props.comments.length > 1 ? 'replies':'reply'}</>)}</span>
             </button>
         </ReactButtonStyle>
     )

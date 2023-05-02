@@ -136,6 +136,7 @@ function Post(props) {
                         handleComment = {handleComment}
                         comments = {comments}
                         openning = {showComments}
+                        text = 'Comment'
                     />
                     <ShareButton
                         handleShare = {handleShare}
