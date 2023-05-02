@@ -43,28 +43,12 @@ function Header() {
     navigate('/home');
   }
 
-  const handleShop = () => {
-    setActive('shop')
-    if(expandNav) {
-      setExpandNav(!expandNav)
-    }
-    navigate('/shop');
-  }
-
   const handleMarket = () => {
     setActive('market')
     if(expandNav) {
       setExpandNav(!expandNav)
     }
     navigate('/market');
-  }
-
-  const handleSearch = () => {
-    setActive('search')
-    if(expandNav) {
-      setExpandNav(!expandNav)
-    }
-    navigate('/search');
   }
 
   return (
@@ -81,14 +65,8 @@ function Header() {
             <NavItem onClick={handleHome} className={active==='home'?'active':''}>
               <a><span>HOME</span></a>
             </NavItem>
-            <NavItem onClick={handleShop} className={active==='shop'?'active':''}>
-              <a><span>SHOP</span></a>
-            </NavItem>
             <NavItem onClick={handleMarket} className={active==='market'?'active':''}>
               <a><span>MARKET</span></a>
-            </NavItem>
-            <NavItem onClick={handleSearch} className={active==='search'?'before-uf active':'before-uf '}>
-              <a><span>SEARCH</span></a>
             </NavItem>
             
             <UserInfo onClick={handleUserInfo} className={active==='about'?'active':''}>

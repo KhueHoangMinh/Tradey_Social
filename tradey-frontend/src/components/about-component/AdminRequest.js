@@ -1,74 +1,9 @@
 import React, {useEffect, useState} from 'react'
+import {  useSelector } from 'react-redux'
 import styled from 'styled-components'
 import Axios from 'axios'
-
-function Item(props) {
-    const [product,setProduct] = useState()
-
-    useEffect(()=>{
-      Axios.post('/api/getproductbyid', {type: 'shop',productId: props.productId})
-      .then(res => {
-        setProduct(res.data[0])
-      })
-    },[])
-
-    return (
-      <ItemPanel>
-        <div className='product-info'>
-          <img src={product ? product.image:''} alt=''/>
-          <div className='left-info'>
-            <div className='info'>
-              <label>Name:</label>
-              <span className='name'>{product ? product.product_name:''}</span>
-            </div>
-            <div className='info'>
-              <label>Description:</label>
-              <span className='desc'>{product ? product.description:''}</span>
-            </div>
-            <div className='info'>
-              <label>Price:</label>
-              <span className='price'>{product ? product.price:''}</span>
-            </div>
-          </div>
-        </div>
-      </ItemPanel>
-    )
-  }
-  
-  const ItemPanel = styled.div`
-  display: flex;
-  flex-direction: row;
-  height: 120px;
-  width: calc(100% - 20px);
-  justify-content: space-between;
-  background-color: rgba(255,255,255,0.2);
-  border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 10px;
-  .product-info {
-    display: flex;
-    flex-direction: row;
-    img {
-      height: 100%;
-      width: 120px;
-      object-fit: cover;
-    }
-    .left-info {
-      margin-left: 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px 0px;
-      .info {
-        display: grid;
-        grid-template-columns: 110px 1fr;
-        label {
-          font-weight: 600;
-        }
-      }
-    }
-  }
-  `
+import Loading from '../Loading.js'
+import ItemPanel from './Item'
 
 function SingleAdminRequest(props) {
     const [user,setUser] = useState()
@@ -92,9 +27,15 @@ function SingleAdminRequest(props) {
                 <div className='item-list'>
                     {
                         props.order.billItems.map((item)=>(
-                            <Item
-                                productId = {item.product_id}
-                            />
+                          <ItemPanel
+                            type = {4}
+                            productId = {item.product_id}
+                            productName = {item.product_name}
+                            productImage = {item.image}
+                            productDescription = {item.description}
+                            productPrice = {item.price}
+                            quantity = {item.quantity}
+                          />
                         ))
                     }
                 </div>
@@ -106,25 +47,27 @@ function SingleAdminRequest(props) {
 
 function AdminRequest(props) {
     const [orders, setOrders] = useState([])
+    const [loading,setLoading] = useState(0)
+    const user = useSelector(state=>state.auth.user)
     useEffect(()=>{
-        Axios.post('/api/getshopbills')
+        Axios.post('/api/getrequests', {userId: user.user_id})
         .then(res=>{
           setOrders(res.data)
+          setLoading(1)
         })
     },[])
 
     useEffect(()=>{
-      console.log(orders)
     },[orders])
 
   return (
     <div>
         {
-            orders && orders.map((order)=>(
+           loading == 1 ? (orders && orders.map((order)=>(
                 <SingleAdminRequest
                     order = {order}
                 />
-            ))
+            ))) : <Loading></Loading>
         }
     </div>
   )

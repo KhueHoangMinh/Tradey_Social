@@ -16,7 +16,6 @@ function RightSide() {
   return (
     <div>
         <Panel>
-            <h2>Advertisement</h2>
             {
               loading == 1 ? (advertisement.map((ad)=>(
                 <a className='advertisement' href={ad.link}><img src={ad.image} alt=''/></a>
@@ -30,7 +29,7 @@ function RightSide() {
 const Panel = styled.div`
 background-color: rgb(10,10,10);
 border-radius: 10px;
-box-shadow: 5px 5px 10px black;
+box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
 padding: 30px;
 position: fixed;
 width: calc(25% - 80px);
@@ -41,15 +40,6 @@ flex-direction: column;
 align-items: center;
 overflow-y: hidden scroll;
 overflow-x: hidden;
-h2 {
-  text-align: center;
-  width: 100%;
-  margin: 0px;
-  border-bottom: 1px solid rgba(255,255,255,0.6);
-  padding-bottom: 5px;
-  color: rgb(51,255,255);
-  letter-spacing: 3px;
-}
 img {
   width: calc(100% + 60px);
   padding: 5px 0;

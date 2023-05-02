@@ -2,16 +2,17 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import Axios  from 'axios'
+import Button from '../Button'
 
 function LeftSide(props) {
   const user = useSelector(state=>state.auth.user)
-  console.log(user);
   const [postText,setPostText] = useState()
   const [image,setImage] = useState(null)
   const [video,setVideo] = useState(null)
   const date = new Date()
 
-  const postArticle = ()=>{
+  const postArticle = (e)=>{
+    e.preventDefault()
     Axios.post('/api/post', {
       publisherId: user.user_id,
       time: date.getFullYear().toString()+'-'+(date.getMonth()+1).toString()+'-'+date.getDate().toString()+' '+date.getHours().toString()+'-'+date.getMinutes().toString()+'-'+date.getSeconds().toString(),
@@ -23,12 +24,11 @@ function LeftSide(props) {
         "Content-Type": "multipart/form-data"
       }
     })
-    .then(result=>console.log(result))
+    .then(res=>{})
   }
   return (
     <div>
-        <Panel>
-            <h2>Share your day!</h2>
+        <Panel onSubmit={e=>postArticle(e)}>
             <div className='userinfo'>
               <img src={user ? user.photoURL:''} alt=''/>
               <div>
@@ -36,7 +36,7 @@ function LeftSide(props) {
                 <span>{user ? user.email : ''}</span>
               </div>
             </div>
-            <textarea type='text' value={postText} onChange={(e)=>{setPostText(e.target.value)}}/>
+            <textarea type='text' value={postText} onChange={(e)=>{setPostText(e.target.value)}} rows='3' placeholder='Write something...'/>
             {image && 
             <img src={URL.createObjectURL(image)} alt=''/>}
             {video && 
@@ -50,43 +50,35 @@ function LeftSide(props) {
                   Image
                   <input name='uploadedImage' type='file' style={{display: 'none'}} onChange={e=>setImage(e.target.files[0])}/>
                 </label>
-                <label className='vidbtn'>
+                {/* <label className='vidbtn'>
                   <img src='/images/video.svg' alt=''/>
                   Video
                   <input name='uploadedVideo' type='file' style={{display: 'none'}} onChange={e=>setVideo(e.target.files[0])}/>
-                </label>
+                </label> */}
               </div>
-              <button className='postbtn' onClick={postArticle}>Post</button>
+              <button
+                className='postbtn'
+                type='submit'
+              >Post</button>
             </div>
         </Panel>
     </div>
   )
 }
 
-const Panel = styled.div`
+const Panel = styled.form`
 background-color: rgb(10,10,10);
 border-radius: 10px;
-box-shadow: 5px 5px 10px black;
+box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
 padding: 30px;
 display: flex;
 flex-direction: column;
 position: fixed;
 width: calc(25% - 80px);
-h2 {
-  text-align: center;
-  width: 100%;
-  margin: 0px;
-  border-bottom: 1px solid rgba(255,255,255,0.6);
-  padding-bottom: 5px;
-  color: rgb(51,255,255);
-  letter-spacing: 3px;
-}
 .userinfo {
   display: flex;
   flex-direction: row;
-  margin: 20px 0;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgb(200,200,200);
+  margin: 10px 0;
 
   div{
     display: flex;
@@ -112,10 +104,14 @@ h2 {
 
 textarea {
 background-color: transparent;
-border: 1px solid rgb(250,250,250);
-height: 100px;
+border: none;
+height: fit-content;
+padding: 10px;
 margin-bottom: 20px;
 color: white;
+outline: none;
+line-height: 18px;
+resize: none;
 }
 
 label {
@@ -131,18 +127,6 @@ label {
   justify-content: center;
 }
 
-button {
-  color: rgb(230,230,230);
-  font-weight: 600;
-  width: 60px;
-  height: 30px;
-  padding: 2px 5px;
-  transition: 0.2s ease-in-out;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-}
 
 .buttons {
   display: inline-flex;
@@ -155,32 +139,67 @@ button {
       width: 70px;
     }
     .imgbtn {
-      background-color: rgba(51,255,51,0.3);
       img {
         margin-right: 2px;
-        width: 10px;
+        width: 18px;
       }
+      width: fit-content;
+      height: fit-content;
+      padding: 12px 18px;
+      color: white;
+      transition: 0.2s ease-in-out;
+      background-color: transparent;
+      border-radius: 25px;
+      font-size: 20px;
+      font-weight: 700;
+      border: none;
       &:hover {
-        background-color: rgba(51,255,51,0.7);
+        cursor: pointer;
+        background-color: white;
+        color: black;
+        box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
       }
     }
     .vidbtn {
-      background-color: rgba(255,51,51,0.3);
       img {
         margin-right: 2px;
         width: 10px;
       }
+      width: fit-content;
+      height: fit-content;
+      padding: 12px 18px;
+      color: white;
+      transition: 0.2s ease-in-out;
+      background-color: transparent;
+      border-radius: 25px;
+      font-size: 20px;
+      font-weight: 700;
+      border: none;
       &:hover {
-        background-color: rgba(255,51,51,0.7);
+        cursor: pointer;
+        background-color: white;
+        color: black;
+        box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
       }
     }
   }
   .postbtn {
-    background-color: rgba(51,255,255,0.3);
-    border-radius: 20px;
-      &:hover {
-        background-color: rgba(51,255,255,0.7);
-      }
+    width: fit-content;
+    height: fit-content;
+    padding: 12px 18px;
+    color: white;
+    transition: 0.2s ease-in-out;
+    background-color: transparent;
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: 700;
+    border: none;
+    &:hover {
+      cursor: pointer;
+      background-color: white;
+      color: black;
+      box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
+    }
   }
 }
 @media (max-width: 1200px) {

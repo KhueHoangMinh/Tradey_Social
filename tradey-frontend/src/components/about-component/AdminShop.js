@@ -20,14 +20,14 @@ function AdminShop() {
       e.preventDefault()
 
       const data = new FormData()
+      data.append('userId', user.user_id)
       data.append('name', name)
       data.append('description', description)
       data.append('price', price)
       data.append('image', image)
+      data.append('type', 'shop')
 
-      console.log(data)
-
-      Axios.post('/api/postshopproduct', data, {
+      Axios.post('/api/postproduct', data, {
           headers: {
               'Content-Type': 'multipart/form-data'
           }
@@ -38,7 +38,7 @@ function AdminShop() {
     }
 
     useEffect(()=>{
-      Axios.post('/api/getadminshop', {userId: user.user_id})
+      Axios.post('/api/getproductbysellerid', {userId: user.user_id})
       .then(res=> {
         setShopProducts(res.data)
       })

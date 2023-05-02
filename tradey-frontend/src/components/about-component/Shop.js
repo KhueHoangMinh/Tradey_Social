@@ -22,11 +22,11 @@ function Shop() {
     data.append('userId', user.user_id)
     data.append('name', name)
     data.append('description', description)
-    data.append('time', date.getFullYear().toString()+'-'+(date.getMonth()+1).toString()+'-'+date.getDate().toString()+' '+date.getHours().toString()+'-'+date.getMinutes().toString()+'-'+date.getSeconds().toString())
     data.append('price', price)
     data.append('image', image)
+    data.append('type', 'market')
 
-    Axios.post('/api/postmarketproduct', data, {
+    Axios.post('/api/postproduct', data, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -37,7 +37,7 @@ function Shop() {
   }
 
   useEffect(()=>{
-    Axios.post('/api/getusermarket', {userId: user.user_id})
+    Axios.post('/api/getproductbysellerid', {userId: user.user_id})
     .then(res=> {
       setMarketProducts(res.data)
       setLoading(1)

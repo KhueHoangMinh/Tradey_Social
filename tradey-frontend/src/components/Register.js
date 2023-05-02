@@ -50,7 +50,6 @@ function Register() {
   }
 
   useEffect(()=>{
-    console.log(user)
   },[user])
   return (
       <Container>

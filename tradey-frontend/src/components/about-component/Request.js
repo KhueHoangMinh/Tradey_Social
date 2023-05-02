@@ -90,6 +90,20 @@ function SingleRequest(props) {
                         <span>{props.order.time}</span>
                     </div>
                 </div>
+                <div className='order-info'>
+                  <div className='indiv-order-info'>
+                    <strong>Phone: </strong>
+                    <span>{props.order.phone}</span>
+                  </div>
+                  <div className='indiv-order-info'>
+                    <strong>Address: </strong>
+                    <span>{props.order.address}</span>
+                  </div>
+                  <div className='indiv-order-info'>
+                    <strong>Note: </strong>
+                    <span>{props.order.note}</span>
+                  </div>
+                </div>
                 <div className='item-list'>
                     {
                         props.order.billItems.map((item)=>(
@@ -109,7 +123,7 @@ function Request(props) {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(0)
   useEffect(()=>{
-      Axios.post('/api/getmarketbills',{userId: props.user.user_id})
+      Axios.post('/api/getrequests',{userId: props.user.user_id})
       .then(res=>{
           setOrders(res.data)
           setLoading(1)
@@ -157,6 +171,12 @@ margin-bottom: 20px;
     width: 50px;
     border-radius: 50%;
     margin-right: 10px;
+  }
+}
+.order-info {
+  .indiv-order-info {
+    display: grid;
+    grid-template-columns: 80px 1fr;
   }
 }
 .item-list {

@@ -6,36 +6,38 @@ function Item(props) {
   const navigate = useNavigate()
 
   const handleNav = () => {
-    // console.log(props)
     navigate('/marketproduct',{state: {
-      userId: props.userId,
-      sellerId: props.sellerId,
       productId: props.productId,
-      image: props.image,
-      name: props.name,
-      description: props.description,
-      price: props.price
+      type: props.type
     }})
 
   }
   return (
     <div>
-      <ItemPanel style={{backgroundImage: `url(${props.image})`}}>
+      <ItemPanel onClick={handleNav}>
         <div className='item-info'>
-          
-          <h3 className='more-details' onClick={handleNav}>MORE DETAILS</h3>
-          <div className='user-detail'>
-            <img src={props.userPhotoURL} alt=''/>
-              <div>
-                <h3>{props.userDisplayName}</h3>
-                <span>{props.userEmail}</span>
-                <span>{props.productTime}</span>
-              </div>
+          <div className='item-top'>
+            {
+              props.type == 'shop' ? (
+                <div className='admin-product'>
+                  Admin
+                </div>
+              ) : ''
+            }
+            <img className='item-image' src={props.image} alt=''/>
+            <div className='user-detail'>
+              <img src={props.userPhotoURL} alt=''/>
+                <div>
+                  <h3><a href='https://youtube.com'>{props.userDisplayName}</a></h3>
+                  <span>{props.userEmail}</span>
+                  <span>{props.productTime}</span>
+                </div>
+            </div>
           </div>
           <div className='item-detail'>
             <h3>{props.name}</h3>
             <p className='desc'>{props.description}</p>
-            <span className='price'>{props.price}</span>
+            <span className='price'>$ {props.price}</span>
           </div>
         </div>
       </ItemPanel>
@@ -44,96 +46,133 @@ function Item(props) {
 }
 
 const ItemPanel = styled.div`
-background-color: rgb(200,200,200);
-border-radius: 30px;
+border-radius: 10px;
+overflow: hidden;
 width: 100%;
-height: 500px;
 display: flex;
 flex-direction: column;
-background-position-y: -100px;
-background-size: cover;
+box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
 transition: 0.2s ease-in-out;
+position: relative;
+color: white;
 .item-info {
   display: flex;
+  position: relative;
   flex-direction: column;
-  height: 100%;
-  padding: 0px 10px;
-  border-radius: 30px;
   overflow: hidden;
-  background-image: linear-gradient(0deg,rgba(0,0,0,1) 30%,transparent);
-  background-color: transparent;
-  transition: 0.2s ease-in-out;
-  
-  .more-details {
+  .item-top {
     position: relative;
-    height: 0;
-    margin: auto auto;
-    color: transparent;
-    letter-spacing: 2px;
-  }
-  .user-detail {
-  display: flex;
-  flex-direction: row;
-  margin: 20px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.6);
-
-  div{
-    display: flex;
-    flex-direction: column;
-    h3 {
-      padding: 0;
-      margin: 0;
-      margin-bottom: 5px;
+    width: 100%;
+    overflow: hidden;
+    &::after {
+      padding-top: 60%;
+      display: block;
+      content: "";
     }
+    .admin-product {
+      padding: 15px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 0 0 0 10px;
+      background-color: black;
+      color: white;
+      box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 2;
+    }
+    .item-image {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      transition: 0.2s ease-in-out;
+      z-index: 1;
+    }
+    .user-detail {
+      position: absolute;
+      display: flex;
+      flex-direction: row;
+      bottom: unset;
+      bottom: -100%;
+      padding: 20px;
+      z-index: 2;
+      width: 100%;
+      transition: 0.2s ease-in-out;
+      background: linear-gradient(0deg, rgba(10,10,10,1), rgba(10,10,10,0.8),rgba(0,0,0,0));
 
-    span {
-      color: rgb(180,180,180);
-      font-size: 13px;
+      div{
+        display: flex;
+        flex-direction: column;
+        h3 {
+          padding: 0;
+          margin: 0;
+          margin-bottom: 1px;
+          a {
+            text-decoration: none;
+            color: rgba(255,255,255,0.9);
+            transition: 0.2s ease-in-out;
+            &:hover {
+              color: rgba(255,255,255,1);
+            }
+          }
+        }
+
+        span {
+          color: rgb(180,180,180);
+          font-size: 13px;
+        }
+      }
+      img {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        margin-right: 10px;
+        position: relative;
+      }
     }
   }
-  img {
-    height: 50px;
-    width: 50px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-}
   .item-detail {
-    width:100%;
+    width: calc(100% - 40px);
     position: relative;
-    height: fit-content;
-    bottom: calc(-10% + 65px);
+    height: 120px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
+    background-color: rgb(10,10,10);
     h3 {
       margin: 0;
     }
     .desc {
+      text-align: justify;
       line-height: 20px;
-      height:60px;
+      height: 40px;
       width: 100%;
       overflow: hidden;
       white-space: normal;
       text-overflow: ellipsis;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
     }
     .price {
-      color: rgb(51,255,51);
+      font-weight: 600;
+      color: lightgreen;
     }
   }
 }
 
 &:hover {
-  transform: scale(1.03);
-  .item-info {
-    background-color: rgb(0,0,0,0.6);
-    .more-details {
-      color: white;
+  .item-top {
+    .item-image {
+      transform: scale(1.1);
+    }
+    .user-detail {
+      bottom: 0;
     }
   }
-  cursor: default;
+  cursor: pointer;
 }
 `
 

@@ -1,5 +1,6 @@
 import Axios from 'axios'
 import React, {useState} from 'react'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 function Item(props) {
@@ -8,6 +9,16 @@ function Item(props) {
   const [description,setDescription]= useState()    
   const [price,setPrice]= useState()    
   const [image,setImage]= useState()  
+
+  
+  const navigate = useNavigate()
+
+  const handleNav = () => {
+    navigate('/marketproduct',{state: {
+      productId: props.productId,
+      type: props.type
+    }})
+  }
 
 
   const handleCancel = () => {
@@ -19,7 +30,7 @@ function Item(props) {
   }
 
   const handleDelete = () => {
-    Axios.post('/api/delete'+(props.type === 0 ? 'shop':'market')+'product',{productId: props.productId})
+    Axios.post('/api/deleteproduct',{productId: props.productId})
   }
   
   
@@ -35,7 +46,7 @@ function Item(props) {
     for(let i = lastSlash + 1; i < props.productImage.length; i++) {
       imageName = imageName + props.productImage[i]
     }
-    Axios.post('/api/update'+(props.type === 0 ? 'shop':'market')+'product',{
+    Axios.post('/api/updateproduct',{
       productId: props.productId,
       name: name,
       description: description,
@@ -52,32 +63,30 @@ function Item(props) {
   return (
       <ItemPanel>
         <div className='product-info'>
-          <img src={image && editting?URL.createObjectURL(image):props.productImage} alt=''/>
+          <img className='product-image' src={image && editting?URL.createObjectURL(image):props.productImage} alt=''/>
+          <img className='background-image' src={props.productImage} alt=''/>
           <div className='left-info'>
             <div className='info'>
-              <label>Name:</label>
-              {!editting ? (<span className='name'>{name?name:props.productName}</span>):(<input type='text' value={name} onChange={(e)=>setName(e.target.value)}/>)}
+              {!editting ? (<h2 onClick={handleNav} className='name'>{name?name:props.productName}</h2>):(<input type='text' value={name} onChange={(e)=>setName(e.target.value)}/>)}
             </div>
             <div className='info'>
-              <label>Description:</label>
               {!editting ? (<span className='desc'>{description?description:props.productDescription}</span>):(<input type='text' value={description} onChange={(e)=>setDescription(e.target.value)}/>)}
             </div>
             <div className='info'>
-              <label>Price:</label>
               {!editting ? (<span className='price'>${price?price:props.productPrice}</span>):(<input type='number' value={price} onChange={(e)=>setPrice(e.target.value)}/>)}
             </div>
             {props.type != 3 && props.type != 4 ? 
             (
               <div className='info'>
-                <label>Image:</label>
                 {!editting ? (<span className='image'>{props.productImage}</span>):(<input type='file' onChange={(e)=>setImage(e.target.files[0])}/>)}
               </div>
             )
             :
             (
-              <div className='info'>
-                <label>Quantity:</label>
-                {props.quantity ? props.quantity : 'NaN'}
+              <div className='quantity'>
+                {props.type == 3 ? <button className='quant-btn'>-</button> : ''}
+                x{props.quantity ? props.quantity : 'NaN'}
+                {props.type == 3 ? <button className='quant-btn'>+</button> : ''}
               </div>
             )
           }
@@ -107,43 +116,105 @@ function Item(props) {
   const ItemPanel = styled.div`
   display: flex;
   flex-direction: row;
-  height: 120px;
-  width: calc(100% - 20px);
+  height: 150px;
+  width: calc(100%);
   justify-content: space-between;
   background-color: rgba(255,255,255,0.2);
   border-radius: 10px;
-  padding: 10px;
   margin-bottom: 10px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
+  color: white;
   .product-info {
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: row;
-    img {
+    position: relative;
+    z-index: 1;
+    .product-image {
       height: 100%;
-      width: 120px;
+      width: 150px;
       object-fit: cover;
+      box-shadow: 5px 0px 20px rgba(0,0,0,0.6);
+    }
+    .background-image {
+      width: 250%;
+      height: 250%;
+      top: -50%;
+      left: -50%;
+      position: absolute;
+      object-fit: cover;
+      filter: blur(15px) brightness(0.3);
+      z-index: -1;
     }
     .left-info {
       margin-left: 10px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 10px 0px;
+      padding: 10px;
       overflow-x: hidden;
-      .info {
-        display: grid;
-        grid-template-columns: 110px 1fr;
-        label {
-          font-weight: 600;
+      .quantity {
+        padding: 10px 5px;
+        background-color: black;
+        color: white;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        border-radius: 12px;
+        box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
+        display: flex;
+        .quant-btn {
+          margin: 0 5px;
+          width: 18px;
+          height: 18px;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+          font-weight: 500;
+          background-color: rgba(255,255,255,0.1);
+          color: white;
+          border: 1px solid rgba(255,255,255,0.5);
+          border-radius: 3px;
+          transition: 0.2s ease-in-out;
+          &:hover {
+            background-color: white;
+            color: black;
+          }
         }
-        span {
+      }
+      .info {
+        position: relative;
+        h2 {
+          padding: 0;
+          margin: 0;
+          margin-bottom: 5px;
+          color: rgba(255,255,255,0.8);
+          transition: 0.2s ease-in-out;
+          &:hover {
+            cursor: pointer;
+            color: rgba(255,255,255,1);
+          }
+        }
+        .desc {
+          text-align: justify;
+          line-height: 20px;
+          height: 40px;
+          width: 100%;
           overflow: hidden;
           white-space: normal;
-          display: -webkit-box;
-          /* -webkit-box-clamp: 1;
-          -webkit-box-orient: vertical; */
           text-overflow: ellipsis;
-          &:hover {
-          }
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+        .price {
+          font-weight: 600;
+          color: lightgreen;
         }
         input {
             border: none;

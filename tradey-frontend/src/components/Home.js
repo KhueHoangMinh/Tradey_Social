@@ -9,7 +9,6 @@ import RightSide from './home-components/RightSide'
 function Home() {
   const user = useSelector(state=>state.auth.user)
   const navigate = useNavigate()
-  // console.log(user)
   return (
     <div>
       <HomePage>
