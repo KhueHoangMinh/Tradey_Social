@@ -72,8 +72,14 @@ function Comment(props) {
     const handleShowCmtComment = () => {
         if(!showCmtComments) {
             props.setShowingCommentInput(props.comment.comment_id)
+            setShowCmtComments(!showCmtComments)
+        } else {
+            if(props.showingCommentInput == props.comment.comment_id) {
+                setShowCmtComments(!showCmtComments)
+            } else {
+                props.setShowingCommentInput(props.comment.comment_id)
+            }
         }
-        setShowCmtComments(!showCmtComments)
     }
 
     return (

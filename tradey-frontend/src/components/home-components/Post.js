@@ -31,8 +31,14 @@ function Post(props) {
     const handleComment = () => {
         if(!showComments) {
             props.setShowingCommentInput(props.id)
+            setShowComments(!showComments)
+        } else {
+            if(props.showingCommentInput == props.id) {
+                setShowComments(!showComments)
+            } else {
+                props.setShowingCommentInput(props.id)
+            }
         }
-        setShowComments(!showComments)
     }
 
     const handleShare = () => {
