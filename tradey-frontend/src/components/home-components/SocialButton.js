@@ -12,6 +12,9 @@ function ReactButton(props) {
                     <button onClick={()=>props.handleLike('love')} className={props.liked && props.liked.type == 'love' ? `other love liked`:'other love'}>
                         <img src='/images/love.svg' alt=''/>
                     </button>
+                    <button onClick={()=>props.handleLike('haha')} className={props.liked && props.liked.type == 'haha' ? `other haha liked`:'other haha'}>
+                        <img src='/images/haha.svg' alt=''/>
+                    </button>
                     <button onClick={()=>props.handleLike('wow')} className={props.liked && props.liked.type == 'wow' ? `other wow liked`:'other wow'}>
                         <img src='/images/wow.svg' alt=''/>
                     </button>
@@ -125,14 +128,23 @@ button {
     .other-reacts:has(.love:hover) {
         background-color: rgba(255,200,200,1);
     }
-    .wow {
+    .haha {
         &:hover {
             background-color: rgba(255,255,200,1);
             color: yellow;
         }
     }
-    .other-reacts:has(.wow:hover) {
+    .other-reacts:has(.haha:hover) {
         background-color: rgba(255,255,200,1);
+    }
+    .wow {
+        &:hover {
+            background-color: rgba(200,255,200,1);
+            color: lightgreen;
+        }
+    }
+    .other-reacts:has(.wow:hover) {
+        background-color: rgba(200,255,200,1);
     }
     .sad {
         &:hover {
@@ -163,9 +175,13 @@ button {
         background-color: rgba(255,200,200,1);
         color: red;
     }
-    .liked.wow{
+    .liked.haha{
         background-color: rgba(255,255,200,1);
         color: rgb(221,221,0);
+    }
+    .liked.wow{
+        background-color: rgba(200,255,200,1);
+        color: rgb(110,221,110);
     }
     .liked.sad{
         background-color: rgba(200,200,200,1);
@@ -239,9 +255,13 @@ button {
                     background-color: rgba(255,200,200,1);
                     color: red;
                 }
-                .liked.wow{
+                .liked.haha{
                     background-color: rgba(255,255,200,1);
                     color: rgb(221,221,0);
+                }
+                .liked.wow{
+                    background-color: rgba(200,255,200,1);
+                    color: rgb(110,221,110);
                 }
                 .liked.sad{
                     background-color: rgba(200,200,200,1);

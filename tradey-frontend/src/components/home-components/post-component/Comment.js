@@ -30,6 +30,7 @@ function Comment(props) {
             var reacts = [
                 {react: 'like',quant: 0},
                 {react: 'love',quant: 0},
+                {react: 'haha',quant: 0},
                 {react: 'wow',quant: 0},
                 {react: 'sad',quant: 0},
                 {react: 'angry',quant: 0}
@@ -45,14 +46,17 @@ function Comment(props) {
                     case 'love':
                         reacts[1].quant++
                         break
-                    case 'wow':
+                    case 'haha':
                         reacts[2].quant++
                         break
-                    case 'sad':
+                    case 'wow':
                         reacts[3].quant++
                         break
-                    case 'angry':
+                    case 'sad':
                         reacts[4].quant++
+                        break
+                    case 'angry':
+                        reacts[5].quant++
                         break
                 }
             }
