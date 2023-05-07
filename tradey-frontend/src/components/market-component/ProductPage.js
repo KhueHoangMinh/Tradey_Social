@@ -44,13 +44,13 @@ function ProductPage(props) {
           {
             loading == 1 ? (
             <div className='content'>
-              <img className='background-image' src={product ? product.image:''} alt=''/>
+              <img className='background-image' src={product ? window.host + product.image:''} alt=''/>
               <div className='image-container'>
-                <img className='product-image' src={product ? product.image:''} alt=''/>
+                <img className='product-image' src={product ? window.host + product.image:''} alt=''/>
               </div>
               <LeftColumn>
                 <div className='user-detail'>
-                  <img src={seller ? seller.photourl:''} alt=''/>
+                  <img src={seller ? (seller.photourl ? window.host + seller.photourl:'/images/user.png'):'/images/user.png'} alt=''/>
                     <div>
                       <h3><a href='https://youtube.com'>{seller ? seller.name:''}</a></h3>
                       <span>{seller ? seller.email:''}</span>

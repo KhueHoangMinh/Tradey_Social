@@ -93,7 +93,7 @@ function Comment(props) {
         <CommentStyle className='user-post'>
             <div className='user-comment'> 
                         <div className='commenter-info'>
-                            <img className='user-image' src={cmtContent && cmtContent.photourl} alt=''/>
+                            <img className='user-image' src={cmtContent && (cmtContent.photourl ? (window.host + cmtContent.photourl) : '/images/user.png')} alt=''/>
                             <div>
                                 <h3>{cmtContent && cmtContent.name}</h3>
                                 <span>{cmtContent && cmtContent.time}</span>

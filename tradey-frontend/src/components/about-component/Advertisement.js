@@ -7,7 +7,7 @@ function Item(props) {
     return (
       <ItemPanel>
         <div className='product-info'>
-          <img src={props.productImage} alt=''/>
+          <img src={window.host + props.productImage} alt=''/>
           <div className='left-info'>
             <div className='info'>
               <label>Name:</label>

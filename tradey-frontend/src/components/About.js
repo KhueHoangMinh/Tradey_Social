@@ -51,62 +51,68 @@ function About() {
         }
     }
   return (
-    <div>
-      <AboutPage>
-        <div></div>
-        <LeftSide>
-            <UserInfo>
-                <img src={user? user.photoURL: '/images/user.png'} alt=''/>
-                <h3>{user? user.displayName: 'user'}</h3>
-                <span>{user? user.email: 'useremail'}</span>    
-            </UserInfo>
-            <Tabs>
-                <div className='buttons'>
-                    <a onClick={()=>{setActive('editDetails')}}>Edit details</a>
-                    <a onClick={()=>{setActive('posts')}}>Your posts</a>
-                    {user ? (user.type != 'admin' && <a onClick={()=>{setActive('shop')}}>Your shop</a>):""}
-                    {user ? (user.type === 'admin' && <a onClick={()=>{setActive('adminshop')}}>Shop</a>):""}
-                    {user ? (user.type === 'admin' && <a onClick={()=>{setActive('advertisement')}}>Advertisement</a>):""}
-                    <a onClick={()=>{
-                        if(user.type === 'admin') {
-                            setActive('adminrequest')
-                        } else {
-                            setActive('request')
-                        }
-                    }}>Order requests</a>
-                    {user ? (user.type != 'admin' && <a onClick={()=>{setActive('cart')}}>Your cart</a>):""}
-                    {user ? (user.type != 'admin' && <a onClick={()=>{setActive('history')}}>Shopping history</a>):""}
-                </div>
-                <a className='logout' onClick={()=>{setActive('logout')}}>Log out</a>
-            </Tabs>
-        </LeftSide>
-        {
-            active === 'posts'?(
-                <div>
-                    {caseByActive()}
-                </div>
-            )
-            :(
-                <RightSide>
-                    {caseByActive()}
-                </RightSide>)
-        }
-      </AboutPage>
-    </div>
+    <AboutPage>
+    <LeftSide>
+        <UserInfo>
+            <img src={user ? (user.photoURL ? user.photoURL : '/images/user.png') : '/images/user.png'} alt=''/>
+            <h3>{user? user.displayName: 'user'}</h3>
+            <span>{user? user.email: 'useremail'}</span>    
+        </UserInfo>
+        <Tabs>
+            <div className='buttons'>
+                <a onClick={()=>{setActive('editDetails')}}>Edit details</a>
+                <a onClick={()=>{setActive('posts')}}>Your posts</a>
+                {user ? (user.type != 'admin' && <a onClick={()=>{setActive('shop')}}>Your shop</a>):""}
+                {user ? (user.type === 'admin' && <a onClick={()=>{setActive('adminshop')}}>Shop</a>):""}
+                {user ? (user.type === 'admin' && <a onClick={()=>{setActive('advertisement')}}>Advertisement</a>):""}
+                <a onClick={()=>{
+                    if(user.type === 'admin') {
+                        setActive('adminrequest')
+                    } else {
+                        setActive('request')
+                    }
+                }}>Order requests</a>
+                {user ? (user.type != 'admin' && <a onClick={()=>{setActive('cart')}}>Your cart</a>):""}
+                {user ? (user.type != 'admin' && <a onClick={()=>{setActive('history')}}>Shopping history</a>):""}
+            </div>
+            <a className='logout' onClick={()=>{setActive('logout')}}>Log out</a>
+        </Tabs>
+    </LeftSide>
+    {
+        active === 'posts'?(
+            <>{caseByActive()}</>
+        )
+        :(
+            <RightSide>
+                {caseByActive()}
+            </RightSide>)
+    }
+    </AboutPage>
   )
 }
 
 const AboutPage = styled.div`
 position: relative;
 display: grid;
-grid-template-columns: 1fr 2fr;
+grid-template-columns: 350px 1fr;
 gap: 20px;
-top: 80px;
-padding: 20px 20%;
+margin-top: 80px;
+padding: 20px;
 background-image: radial-gradient(farthest-corner at 75% 70%, rgb(20,20,20), rgb(25,25,25));
-min-height: calc(100vh - 80px);
-height: fit-content;
+height: calc(100vh - 120px);
 color: rgb(230,230,230);
+.posts {
+    position: relative;
+    height: 100%;
+    padding: 0 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: scroll;
+    ::-webkit-scrollbar {
+    display: none;
+    }
+}
 @media (max-width: 1200px) {
   display: flex;
   flex-direction: column;
@@ -117,12 +123,12 @@ color: rgb(230,230,230);
 const LeftSide = styled.div`
 display: flex;
 flex-direction: column;
-position: fixed;
-width: calc(20vw - 5px);
+position: relative;
+width: 100%;
 height: calc(100vh - 120px);
 background-color: rgb(10,10,10);
 border-radius: 10px;
-box-shadow: 5px 5px 10px black;
+box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
 @media (max-width: 1200px) {
   position: relative;
   width: calc(100%);
@@ -132,8 +138,14 @@ box-shadow: 5px 5px 10px black;
 const RightSide = styled.div`
 background-color: rgb(10,10,10);
 border-radius: 10px;
-box-shadow: 5px 5px 10px black;
+box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
 padding: 20px;
+height: calc(100% - 40px);
+overflow-y: scroll;
+overflow-x: hidden;
+::-webkit-scrollbar {
+  display: none;
+}
 `
 
 const UserInfo = styled.div`

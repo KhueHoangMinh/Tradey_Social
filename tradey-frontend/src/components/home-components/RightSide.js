@@ -14,36 +14,40 @@ function RightSide() {
     })
   },[])
   return (
-    <div>
-        <Panel>
-            {
-              loading == 1 ? (advertisement.map((ad)=>(
-                <a className='advertisement' href={ad.link}><img src={ad.image} alt=''/></a>
-              ))) : <Loading></Loading>
-            }
-        </Panel>
-    </div>
+    <Panel>
+        {
+          loading == 1 ? (advertisement.map((ad)=>(
+            <a className='advertisement' href={ad.link}><img src={ad.image} alt=''/></a>
+          ))) : <Loading></Loading>
+        }
+    </Panel>
   )
 }
 
 const Panel = styled.div`
 background-color: rgb(10,10,10);
 border-radius: 10px;
-box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
-padding: 30px;
-position: fixed;
-width: calc(25% - 80px);
+box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
+padding: 20px;
+margin-left: -20px;
+position: relative;
+width: calc(100% - 40px);
 height: fit-content;
-max-height: calc(100vh - 180px);
+max-height: calc(100vh - 160px);
 display: flex;
 flex-direction: column;
 align-items: center;
-overflow-y: hidden scroll;
-overflow-x: hidden;
+overflow-y: scroll;
+overflow-x: visible;
+::-webkit-scrollbar {
+  display: none;
+}
 img {
-  width: calc(100% + 60px);
-  padding: 5px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.6);
+  width: calc(100%);
+  height: 250px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  object-fit: cover;
 }
 .advertisement {
   display: flex;

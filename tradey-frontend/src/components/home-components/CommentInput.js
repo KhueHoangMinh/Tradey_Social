@@ -8,7 +8,10 @@ function CommentInput(props) {
             {
                 props.showingCommentInput == props.commentFor ? (
                     <form onSubmit={e=>props.handleComment(e)} className='input-comment'>
-                        <input type='text' placeholder='write a comment' value={props.comment} onChange={(e)=>props.setComment(e.target.value)}/>
+                        <input type='text' placeholder={props.text} value={props.comment} onChange={(e)=>{
+                            e.preventDefault()
+                            props.setComment(e.target.value)
+                            }}/>
                         <div className="loading-box">
                             {
                                 !props.loading ? (
@@ -18,7 +21,7 @@ function CommentInput(props) {
                                 ) :''
                             }
                         </div>
-                        <button type="submit">Post</button>
+                        <button type="submit">{props.buttonText}</button>
                     </form>
                 ) : <></>
             }

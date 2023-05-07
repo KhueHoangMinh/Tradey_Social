@@ -9,8 +9,10 @@ function Main(props) {
   const [posts, setPosts] = useState()
   const [loading,setLoading] = useState(0)
   const [showingCommentInput, setShowingCommentInput] = useState()
+  const [showingShareInput, setShowingShareInput] = useState()
   const user = useSelector(state=>state.auth.user)
   useEffect(()=>{
+    console.log('getting posts')
     Axios.get('/api/getposts')
     .then(res=>{
       setPosts(res.data)
@@ -29,7 +31,7 @@ function Main(props) {
   //   document.body.appendChild(script);
   // },[posts])
   return (
-    <div>
+    <MainStyle>
       {
       loading == 1 ?
       ( 
@@ -37,23 +39,34 @@ function Main(props) {
           <Post 
             userId = {user.user_id}
             id = {post.post_id}
-            displayName = {post.name}
-            email = {post.email}
-            photoURL = {post.photourl}
-            time = {post.time}
-            description = {post.description}
-            image = {post.image}
-            video = {post.video}
             showingCommentInput = {showingCommentInput}
             setShowingCommentInput = {setShowingCommentInput}
+            showingShareInput = {showingShareInput}
+            setShowingShareInput = {setShowingShareInput}
+            contentType = 'post'
           />
         ))
       ):<Loading></Loading>
     }
-    </div>
+    </MainStyle>
 
   )
 }
+
+const MainStyle = styled.div`
+position: relative;
+overflow: auto;
+padding-right: 20px;
+width: calc(100% - 40px);
+::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 1200px) {
+  padding: 0;
+  width: calc(100%);
+  overflow: unset;
+}
+`
 
 
 

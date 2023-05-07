@@ -52,10 +52,7 @@ async function run() {
         const email = req.body.email
         var photoURL = req.body.photoURL
         const password = req.body.password
-
-        if(photoURL == null) {
-            photoURL = '/images/user.png'
-        }
+        photoURL = null
 
         const selectQuery = `SELECT email FROM tradey_ks.users_by_email WHERE type IN ('user','googleuser','admin') AND email = ?;`
         const rs = await client.execute(selectQuery,[email])
@@ -63,7 +60,7 @@ async function run() {
         if(rs.rows.length >= 1) {
             res.send('existed')
         } else {
-            const query = `INSERT INTO tradey_ks.users_by_email (user_id,type,name,email,photourl,password) VALUES (uuid(),'${type}','${name}','${email}','${photoURL}','${password}');` 
+            const query = `INSERT INTO tradey_ks.users_by_email (user_id,type,name,email,password) VALUES (uuid(),'${type}','${name}','${email}','${password}');` 
             
             client.execute(query, {prepare: true},async (err, result) => {
                 if(err) {
@@ -71,7 +68,7 @@ async function run() {
                 } else {
                     const query2 = `SELECT user_id FROM tradey_ks.users_by_email WHERE type = '${type}' AND email = '${email}';`
                     const rs2 = await client.execute(query2)
-                    const query3 =  `INSERT INTO tradey_ks.users_by_user_id (user_id,type,name,email,photourl,password) VALUES (${rs2.rows[0].user_id.toString()},'${type}','${name}','${email}','${photoURL}','${password}');`
+                    const query3 =  `INSERT INTO tradey_ks.users_by_user_id (user_id,type,name,email,password) VALUES (${rs2.rows[0].user_id.toString()},'${type}','${name}','${email}','${password}');`
                     client.execute(query3)
                     res.send(result)
                 }
@@ -126,50 +123,97 @@ async function run() {
     app.post('/api/post', postUpload.single('image'),async (req,res)=>{
         const publisherId = req.body.publisherId
         const description = req.body.description
-        var image = ''
-        if(req.file) {
-            image = HOST + filepath + filename
+        const type = req.body.type
+        console.log(type)
+        var source = null
+        var link = null
+        if(type == 'share') {
+            source = req.body.source
         } else {
-            image = null
+            if(req.file) {
+                link = filepath + filename
+            }
         }
-        const video = null
 
         
         const generateId1 = "UPDATE tradey_ks.id SET id = uuid() WHERE selector = 1;"
         const generateId2 = "SELECT id FROM tradey_ks.id WHERE selector = 1;"
 
         await client.execute(generateId1)
-        const idRs = await client.execute(generateId2)
+        var idRs = await client.execute(generateId2)
+        const postId = idRs.rows[0].id
 
-        const query = `INSERT INTO tradey_ks.posts_by_publisher_id (type, post_id, publisher_id, time, description, image, video) VALUES ('userpost',${idRs.rows[0].id.toString()},?,toTimeStamp(now()),?,?,?);`
+        const query = `INSERT INTO tradey_ks.posts_by_post_id (type, post_id, description, publisher_id, time) VALUES (?,?,?,?,toTimeStamp(now()));`
+        const rs = await client.execute(query,[type,idRs.rows[0].id,description,publisherId]);
 
-        const rs = await client.execute(query,[publisherId, description, image, video]);
-        const query2 = `SELECT post_id, time FROM tradey_ks.posts_by_publisher_id WHERE type = 'userpost' AND publisher_id = ? AND post_id = ?;`
-        const rs2 = await client.execute(query2,[publisherId, idRs.rows[0].id.toString()])
-        var query3 = `INSERT INTO tradey_ks.posts_by_post_id (type, post_id, publisher_id, time, description, image, video) VALUES ('userpost',?,?,?,?,?,?);`
-        await client.execute(query3, [rs2.rows[0].post_id, publisherId, rs2.rows[0].time, description, image, video])
-        var query3 = `INSERT INTO tradey_ks.posts_by_time (type, post_id, publisher_id, time, description, image, video) VALUES ('userpost',?,?,?,?,?,?);`
-        await client.execute(query3, [rs2.rows[0].post_id, publisherId, rs2.rows[0].time, description, image, video])
+        var query2 = `SELECT time FROM tradey_ks.posts_by_post_id WHERE post_id = ?;`
+        var rs2 = await client.execute(query2,[idRs.rows[0].id])
 
-        res.send(rs.rows)
+        var query3 = `INSERT INTO tradey_ks.posts_by_publisher_id (type, post_id, description, publisher_id, time) VALUES (?,?,?,?,?);`
+        await client.execute(query3, [type,idRs.rows[0].id,description,publisherId,rs2.rows[0].time])
+
+        if(source || link) {
+            await client.execute(generateId1)
+            idRs = await client.execute(generateId2)
+    
+            query3 = `INSERT INTO tradey_ks.post_contents_by_content_id (content_id,post_id,source,link,content_description) VALUES (?,?,?,?,?);`
+            await client.execute(query3, [idRs.rows[0].id,postId,source,link,description])
+            query3 = `INSERT INTO tradey_ks.post_contents_by_post_id (content_id,post_id,source,link,content_description) VALUES (?,?,?,?,?);`
+            await client.execute(query3, [idRs.rows[0].id,postId,source,link,description])
+        }
+        
+
+        res.send('posted')
     })
 
 
     app.get('/api/getposts', async (req,res) => {
-        const query = "SELECT * FROM tradey_ks.posts_by_time WHERE type = 'userpost' ORDER BY time DESC;"
+        const query = "SELECT * FROM tradey_ks.posts_by_post_id;"
+        var respondRs = {}
         var finalRs = []
-
         const rs = await client.execute(query)
-        for(let i = 0; i < rs.rows.length; i++) {
-            const userQuery = 'SELECT user_id, type, name, photourl, email FROM tradey_ks.users_by_user_id WHERE user_id = ?;'
 
-            const userRs = await client.execute(userQuery,[rs.rows[i].publisher_id])
-            finalRs.push({...rs.rows[i],...userRs.rows[0]})
+        rs.rows.sort((a,b) => (a.time > b.time) ? -1:1)
+
+        for(let i = 0; i < rs.rows.length; i++) {
+            var dataQuery = 'SELECT user_id, type AS user_type, name, photourl, email FROM tradey_ks.users_by_user_id WHERE user_id = ?;'
+            var dataRs1 = await client.execute(dataQuery,[rs.rows[i].publisher_id])
+
+            finalRs.push({...rs.rows[i],...dataRs1.rows[0]})
         }
         res.send(finalRs)
     })
 
-        app.post('/api/getlikes', async (req,res) => {
+
+    app.post('/api/getpostbypostid', async (req,res) => {
+        async function getPostByPostId(postId) {
+            const query = "SELECT * FROM tradey_ks.posts_by_post_id WHERE post_id = ?;"
+            const rs = await client.execute(query,[postId])
+            var respondRs = null
+    
+            var dataQuery = 'SELECT user_id, type AS user_type, name, photourl, email FROM tradey_ks.users_by_user_id WHERE user_id = ?;'
+            var dataRs1 = await client.execute(dataQuery,[rs.rows[0].publisher_id])
+    
+            dataQuery = 'SELECT * FROM tradey_ks.post_contents_by_post_id WHERE post_id = ?;'
+            var dataRs2 = await client.execute(dataQuery,[rs.rows[0].post_id])
+    
+            respondRs = {...rs.rows[0],...dataRs1.rows[0],content: dataRs2.rows}
+    
+            if(dataRs2.rows.length == 1 && dataRs2.rows[0].source) {
+                respondRs = {...respondRs, sharedContent: await getPostByPostId(dataRs2.rows[0].source)}
+            }
+
+            return respondRs
+        }
+
+        const postId = req.body.postId
+
+        const rs = await getPostByPostId(postId)
+
+        res.send(rs)
+    })
+
+    app.post('/api/getlikes', async (req,res) => {
         const postId = req.body.id
         const query = "SELECT * FROM tradey_ks.likes_by_time WHERE post_id = ?;"
 
@@ -211,10 +255,17 @@ async function run() {
 
     app.post('/api/getshares', async (req,res) => {
         const postId = req.body.id
-        const query = "SELECT * FROM tradey_ks.shares_by_time WHERE post_id = ?;"
+        var shares = 0
+        const query = "SELECT * FROM tradey_ks.post_contents_by_post_id;"
+        const rs = await client.execute(query)
 
-        const rs = await client.execute(query,[postId])
-        res.send(rs.rows)
+        for(var i = 0; i < rs.rows.length; i++) {
+            if(rs.rows[i].source == postId) {
+                shares++
+            }
+        }
+
+        res.send({shares: shares})
     })
 
     app.post('/api/like', async (req,res)=> {
@@ -307,7 +358,7 @@ async function run() {
         const description = req.body.description
         const price = req.body.price
         const type = req.body.type
-        const image = HOST + marketFilepath + filename
+        const image = marketFilepath + filename
 
         const generateId1 = "UPDATE tradey_ks.id SET id = uuid() WHERE selector = 1;"
         const generateId2 = "SELECT id FROM tradey_ks.id WHERE selector = 1;"
@@ -351,7 +402,7 @@ async function run() {
 
     app.post('/api/getuserposts', async (req,res) => {
         const userId = req.body.userId
-        const query = `SELECT * FROM tradey_ks.posts_by_publisher_id WHERE type = 'userpost' AND publisher_id = ?;`
+        const query = `SELECT * FROM tradey_ks.posts_by_publisher_id WHERE publisher_id = ?;`
 
         const rs = await client.execute(query, [userId])
 
@@ -437,7 +488,7 @@ async function run() {
 
     app.post('/api/postadvertisement', advertisementUpload.single('image'), async (req,res) => {
         const name = req.body.name
-        const image = HOST + advertisementFilePath + filename
+        const image = advertisementFilePath + filename
         const link = req.body.link
         const query = 'INSERT INTO tradey_ks.advertisement (ad_id,name,image,link) VALUES (uuid(),?,?,?);'
 
@@ -696,7 +747,7 @@ async function run() {
         const price = req.body.price
         var image = ''
         if(req.file) {
-            image = HOST + updateMarketFilepath + req.body.imagePath
+            image = updateMarketFilepath + req.body.imagePath
         }
         const productId = req.body.productId
         
@@ -719,6 +770,87 @@ async function run() {
         const rs = await client.execute(query,[productId])
 
         res.send(rs.rows)
+    })
+
+    var userfilename = ''
+    var userfilepath = 'storage/user/'
+
+    const userStorage = multer.diskStorage({
+        destination: (req,file,cb) => {
+            cb(null,'./'+userfilepath)
+        },
+        filename: (req,file,cb) => {
+            userfilename = 'avatar' + req.body.userId + path.extname(file.originalname)
+            cb(null, userfilename)
+        }
+    })
+
+    const userUpload = multer({storage: userStorage})
+
+    app.post('/api/updateuserinfo', userUpload.single('avatar'),async (req,res)=>{
+        const userId = req.body.userId
+        var avatar = null
+        if(req.file) {
+            avatar = userfilepath + userfilename
+        }
+        const username = req.body.username
+        const password = req.body.password
+
+        if(avatar != null) {
+            const query = `UPDATE tradey_ks.users_by_user_id SET photourl = ? WHERE user_id = ?;`
+            await client.execute(query, [avatar, userId])
+            const selectQuery = `SELECT type, email, password FROM tradey_ks.users_by_user_id WHERE user_id = ?`
+            const selectRs = await client.execute(selectQuery, [userId])
+            const query2 = `UPDATE tradey_ks.users_by_email SET photourl = ? WHERE type = ? AND email = ? AND password = ?;`
+            await client.execute(query2,[avatar,selectRs.rows[0].type,selectRs.rows[0].email,selectRs.rows[0].password])
+        } else if(username != null) {
+            const query = `UPDATE tradey_ks.users_by_user_id SET name = ? WHERE user_id = ?;`
+            await client.execute(query, [username, userId])
+            const selectQuery = `SELECT type, email, password FROM tradey_ks.users_by_user_id WHERE user_id = ?`
+            const selectRs = await client.execute(selectQuery, [userId])
+            const query2 = `UPDATE tradey_ks.users_by_email SET name = ? WHERE type = ? AND email = ? AND password = ?;`
+            await client.execute(query2,[username,selectRs.rows[0].type,selectRs.rows[0].email,selectRs.rows[0].password])
+        } else if (password != null) {
+            const query = `UPDATE tradey_ks.users_by_user_id SET password = ? WHERE user_id = ?;`
+            await client.execute(query, [password, userId])
+            const selectQuery = `SELECT type, email, password FROM tradey_ks.users_by_user_id WHERE user_id = ?`
+            const selectRs = await client.execute(selectQuery, [userId])
+            const query2 = `UPDATE tradey_ks.users_by_email SET password = ? WHERE type = ? AND email = ? AND password = ?;`
+            await client.execute(query2,[password,selectRs.rows[0].type,selectRs.rows[0].email,selectRs.rows[0].password])
+        }
+        
+
+        res.send('updated')
+    })
+
+    app.post('/api/gethighlighted', async (req,res) => {
+        const query = `SELECT * FROM tradey_ks.bill_products_by_bill_id;`
+        var rs = await client.execute(query)
+        var finalRs = []
+
+        for(var i = 0; i< rs.rows.length; i++) {
+            var check = true
+            for(var j = 0; j < finalRs.length; j++) {
+                if(finalRs[j].product_id.toString() == rs.rows[i].product_id.toString()) {
+                    finalRs[j].quantity += rs.rows[i].quantity
+                    check = false
+                    break
+                }
+            }
+            if(check) {
+                finalRs.push({...rs.rows[i]})
+            }
+        }
+
+        finalRs.sort((a, b) => (a.quantity > b.quantity) ? -1 : 1)
+
+        for(var i = 0; i < finalRs.length; i++) {
+            var selectQuery = `SELECT * FROM tradey_ks.products_by_product_id WHERE product_id = ?;`
+            var selectRs = await client.execute(selectQuery, [finalRs[i].product_id])
+            finalRs[i] = {...finalRs[i],...selectRs.rows[0]}
+        }
+
+        res.send(finalRs)
     })
 
 

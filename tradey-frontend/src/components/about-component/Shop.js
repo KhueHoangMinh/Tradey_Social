@@ -74,7 +74,7 @@ function Shop() {
             loading == 1 ? (marketProducts.map((product)=>(
               <Item
                 type={1}
-                productId = {product ? product.market_id:''}
+                productId = {product ? product.product_id:''}
                 productName = {product ? product.product_name:''}
                 productDescription = {product ? product.description:''}
                 productPrice = {product ? product.price:''}

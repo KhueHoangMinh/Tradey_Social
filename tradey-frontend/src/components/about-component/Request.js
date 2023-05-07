@@ -16,7 +16,7 @@ function Item(props) {
   return (
     <ItemPanel>
       <div className='product-info'>
-        <img src={product ? product.image:''} alt=''/>
+        <img src={product ? window.host + product.image:''} alt=''/>
         <div className='left-info'>
           <div className='info'>
             <label>Name:</label>
@@ -83,7 +83,7 @@ function SingleRequest(props) {
         <div>
             <RequestPanel>
                 <div className='userinfo'>
-                    <img src={user? user.photourl: ''} alt=''/>
+                    <img src={user? (user .photourl ? window.host + user.photourl: '/images/user.png') : '/images/user.png'} alt=''/>
                     <div>
                         <h3>{user? user.name: ''}</h3>
                         <span>{user? user.email: ''}</span>

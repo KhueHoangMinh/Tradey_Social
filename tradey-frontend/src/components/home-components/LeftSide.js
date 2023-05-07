@@ -1,24 +1,57 @@
-import React, { useState } from 'react'
+import React, { useState ,useEffect} from 'react'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import Axios  from 'axios'
 import Button from '../Button'
+import { useNavigate } from 'react-router-dom'
+
+function HighlightedItem(props) {
+  const navigate = useNavigate()
+
+  const handleNav = () => {
+    navigate('/marketproduct',{state: {
+      productId: props.productId,
+      type: props.type
+    }})
+  }
+
+  return (
+    <HighlightedItemStyle onClick={handleNav}>
+      <img src={window.host + props.image} alt=''/>
+      <div className='product-info'>
+        <h2>{props.name}</h2>
+        <span>{props.description}</span>
+      </div>
+    </HighlightedItemStyle>
+  )
+}
 
 function LeftSide(props) {
   const user = useSelector(state=>state.auth.user)
   const [postText,setPostText] = useState()
   const [image,setImage] = useState(null)
   const [video,setVideo] = useState(null)
+  const [highlighted,setHighlighted] = useState()
+  const [highlightedList,setHighlightedList] = useState([])
   const date = new Date()
+
+  useEffect(()=>{
+    Axios.post('/api/gethighlighted')
+    .then(res=>{
+      console.log(res.data)
+      setHighlighted(res.data[0])
+      setHighlightedList(res.data.slice(1,res.data.length-1))
+    })
+  },[])
 
   const postArticle = (e)=>{
     e.preventDefault()
     Axios.post('/api/post', {
       publisherId: user.user_id,
-      time: date.getFullYear().toString()+'-'+(date.getMonth()+1).toString()+'-'+date.getDate().toString()+' '+date.getHours().toString()+'-'+date.getMinutes().toString()+'-'+date.getSeconds().toString(),
       description: postText,
       image: image,
-      video: video
+      video: video,
+      type: 'post',
     },{
       headers: {
         "Content-Type": "multipart/form-data"
@@ -27,54 +60,177 @@ function LeftSide(props) {
     .then(res=>{})
   }
   return (
-    <div>
-        <Panel onSubmit={e=>postArticle(e)}>
-            <div className='userinfo'>
-              <img src={user ? user.photoURL:''} alt=''/>
-              <div>
-                <h3>{user ? user.displayName : ''}</h3>
-                <span>{user ? user.email : ''}</span>
-              </div>
+    <LeftSideStyle>
+      <Panel onSubmit={e=>postArticle(e)}>
+          <div className='userinfo'>
+            <img src={user ? (user.photoURL ? (window.host + user.photoURL):'/images/user.png') : '/images/user.png'} alt=''/>
+            <div>
+              <h3>{user ? user.displayName : ''}</h3>
+              <span>{user ? user.email : ''}</span>
             </div>
-            <textarea type='text' value={postText} onChange={(e)=>{setPostText(e.target.value)}} rows='3' placeholder='Write something...'/>
-            {image && 
-            <img src={URL.createObjectURL(image)} alt=''/>}
-            {video && 
-              <video controls>
-                <source src={URL.createObjectURL(video)} type='video'/>
-              </video>}
-            <div className='buttons'>
-              <div>
-                <label className='imgbtn'>
-                  <img src='/images/image.svg' alt=''/>
-                  Image
-                  <input name='uploadedImage' type='file' style={{display: 'none'}} onChange={e=>setImage(e.target.files[0])}/>
-                </label>
-                {/* <label className='vidbtn'>
-                  <img src='/images/video.svg' alt=''/>
-                  Video
-                  <input name='uploadedVideo' type='file' style={{display: 'none'}} onChange={e=>setVideo(e.target.files[0])}/>
-                </label> */}
-              </div>
-              <button
-                className='postbtn'
-                type='submit'
-              >Post</button>
+          </div>
+          <textarea type='text' value={postText} onChange={(e)=>{setPostText(e.target.value)}} rows='3' placeholder='Write something...'/>
+          {image && 
+          <img src={URL.createObjectURL(image)} alt=''/>}
+          {video && 
+            <video controls>
+              <source src={URL.createObjectURL(video)} type='video'/>
+            </video>}
+          <div className='buttons'>
+            <div>
+              <label className='imgbtn'>
+                <img src='/images/image.svg' alt=''/>
+                Image
+                <input name='uploadedImage' type='file' style={{display: 'none'}} onChange={e=>setImage(e.target.files[0])}/>
+              </label>
+              {/* <label className='vidbtn'>
+                <img src='/images/video.svg' alt=''/>
+                Video
+                <input name='uploadedVideo' type='file' style={{display: 'none'}} onChange={e=>setVideo(e.target.files[0])}/>
+              </label> */}
             </div>
-        </Panel>
-    </div>
+            <button
+              className='postbtn'
+              type='submit'
+            >Post</button>
+          </div>
+      </Panel>
+      <Highlighted>
+          {
+            highlighted && 
+            <HighlightedItem
+              productId = {highlighted.product_id}
+              name = {highlighted.product_name}
+              image = {highlighted.image}
+              description = {highlighted.description}
+              type = {highlighted.type}
+            />
+          }
+          <div className='highlighted-list'>
+            {
+              highlightedList.map(item => (
+                <HighlightedItem
+                  productId = {item.product_id}
+                  name = {item.product_name}
+                  image = {item.image}
+                  description = {item.description}
+                  type = {item.type}
+                />
+              ))
+            }
+          </div>
+      </Highlighted>
+    </LeftSideStyle>
   )
 }
+
+const Highlighted = styled.div`
+height: fit-content;
+.highlighted-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+@media (max-width: 1200px) {
+  display: none;
+}
+`
+const HighlightedItemStyle = styled.div`
+position: relative;
+width: 100%;
+height: fit-content;
+border-radius: 10px;
+box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
+overflow: hidden;
+transition: 0.2s ease-in-out;
+display: flex;
+align-items: center;
+justify-content: center;
+&::after {
+  content: "";
+  padding-top: 65%;
+  display: block;
+}
+img {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  filter: grayscale(0.8) brightness(0.6);
+  transition: 0.2s ease-in-out;
+}
+.product-info {
+  position: absolute;
+  bottom: -100%;
+  padding: 20px;
+  height: fit-content;
+  width: calc(100% - 40px);
+  background: linear-gradient(0deg, rgba(10,10,10,1), rgba(10,10,10,0.8),rgba(0,0,0,0));
+  transition: 0.2s ease-in-out;
+  h2 {
+    padding: 0;
+    margin: 0;
+    margin-bottom: 2px;
+    width: 100%;
+    overflow: hidden;
+    white-space: normal;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
+  span {
+    line-height: 15px;
+    height: 30px;
+    width: 100%;
+    overflow: hidden;
+    white-space: normal;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+&:hover {
+  cursor: pointer;
+  img {
+    height: 120%;
+    width: 120%;
+    filter: grayscale(0) brightness(1);
+  }
+  .product-info {
+    bottom: 0;
+  }
+}
+`
+
+const LeftSideStyle = styled.div`
+overflow-y: scroll;
+overflow-x: visible;
+height: calc()(100vh - 40px);
+padding: 0 20px;
+::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 1200px) {
+  padding: 0;
+  overflow: unset;
+  height: fit-content;
+}
+`
 
 const Panel = styled.form`
 background-color: rgb(10,10,10);
 border-radius: 10px;
-box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
+box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
 padding: 30px;
 display: flex;
 flex-direction: column;
-position: fixed;
-width: calc(25% - 80px);
+position: relative;
+width: calc(100% - 60px);
+height: fit-content;
+margin-bottom: 20px;
 .userinfo {
   display: flex;
   flex-direction: row;

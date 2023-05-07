@@ -70,7 +70,7 @@ function Header() {
             </NavItem>
             
             <UserInfo onClick={handleUserInfo} className={active==='about'?'active':''}>
-              <img src={user? (user.photoURL):('/images/user.png')} alt=''/>
+              <img src={user? (user.photoURL ? (user.photoURL):('/images/user.png')):'/images/user.png'} alt=''/>
               <div className='info'>
                 <span>Hello, {user ? user.displayName : 'Customer'}!</span>
               </div>

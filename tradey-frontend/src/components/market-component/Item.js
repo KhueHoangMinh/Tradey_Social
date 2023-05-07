@@ -24,9 +24,9 @@ function Item(props) {
                 </div>
               ) : ''
             }
-            <img className='item-image' src={props.image} alt=''/>
+            <img className='item-image' src={window.host + props.image} alt=''/>
             <div className='user-detail'>
-              <img src={props.userPhotoURL} alt=''/>
+              <img src={props.userPhotoURL ? (window.host + props.userPhotoURL) : '/images/user.png'} alt=''/>
                 <div>
                   <h3><a href='https://youtube.com'>{props.userDisplayName}</a></h3>
                   <span>{props.userEmail}</span>

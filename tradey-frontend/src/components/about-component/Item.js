@@ -64,7 +64,7 @@ function Item(props) {
       <ItemPanel>
         <div className='product-info'>
           <img className='product-image' src={image && editting?URL.createObjectURL(image):props.productImage} alt=''/>
-          <img className='background-image' src={props.productImage} alt=''/>
+          <img className='background-image' src={window.host + props.productImage} alt=''/>
           <div className='left-info'>
             <div className='info'>
               {!editting ? (<h2 onClick={handleNav} className='name'>{name?name:props.productName}</h2>):(<input type='text' value={name} onChange={(e)=>setName(e.target.value)}/>)}

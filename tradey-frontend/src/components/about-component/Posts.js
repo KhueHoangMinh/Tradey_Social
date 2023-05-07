@@ -14,7 +14,7 @@ function Posts(props) {
     })
   },[])
   return (
-    <div>
+    <div className='posts'>
       {
         loading == 1 ? (posts.map((post)=>(
           <Post
@@ -25,8 +25,8 @@ function Posts(props) {
           photoURL = {props.user.photoURL}
           time = {post ? post.time:''}
           description = {post ? post.description:''}
-          image = {post ? post.image:''}
-          video = {post ? post.video:''}/>
+          content = {post ? post.content:[]}
+          />
         ))): <Loading></Loading>
       }
     </div>

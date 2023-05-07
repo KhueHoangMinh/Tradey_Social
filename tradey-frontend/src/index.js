@@ -6,6 +6,8 @@ import './index.css'
 import { Provider } from 'react-redux';
 import store from './store'
 
+window.host = 'http://192.168.1.7:3001/'
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>

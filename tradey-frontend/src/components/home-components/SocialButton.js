@@ -64,7 +64,7 @@ function CommentButton(props) {
         <ReactButtonStyle>
             <button onClick={()=>props.handleComment()} className={`comment ${props.openning ? `openning`:``}`}>
                 <img src='/images/comment.svg' alt=''/>
-                <span>{calcCmtQuant(props.comments)} {props.text != 'reply' ? (<>{props.text}{props.comments.length > 1 ? 's':''}</>):(<>{props.comments.length > 1 ? 'replies':'reply'}</>)}</span>
+                <span>{calcCmtQuant(props.comments)} {props.text != 'reply' ? (<>{props.text}{calcCmtQuant(props.comments) > 1 ? 's':''}</>):(<>{calcCmtQuant(props.comments) > 1 ? 'replies':'reply'}</>)}</span>
             </button>
         </ReactButtonStyle>
     )
@@ -73,9 +73,9 @@ function CommentButton(props) {
 function ShareButton(props) {
     return (
         <ReactButtonStyle>
-            <button onClick={()=>props.handleShare()} className='share'>
+            <button onClick={()=>props.handleShare()} className={`share ${props.openning ? `openning`:``}`}>
                 <img src='/images/share.svg' alt=''/>
-                <span>{props.shares.length} Share{props.shares.length > 1 ? 's':''}</span>
+                <span>{props.shares} Share{props.shares > 1 ? 's':''}</span>
             </button>
         </ReactButtonStyle>
     )
@@ -315,9 +315,13 @@ button {
         color: red;
     }
 }
-.openning {
+.openning.comment {
     background-color: rgba(255,200,200,1);
     color: red;
+}
+.openning.share {
+    background-color: rgba(200,255,200,1);
+    color: green;
 }
 .share {
     &:hover {

@@ -29,6 +29,8 @@ function Comments(props) {
                 handleComment = {handleComment}
                 showingCommentInput = {props.showingCommentInput}
                 loading = {loading}
+                text = 'Write a comment...'
+                buttonText = 'Post'
             />
             {props.comments && props.comments.map(comment=>(
                 <Comment

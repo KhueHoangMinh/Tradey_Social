@@ -17,7 +17,7 @@ function SingleAdminRequest(props) {
         <div>
             <AdminRequestPanel>
                 <div className='userinfo'>
-                    <img src={user? user.photourl: ''} alt=''/>
+                    <img src={user? window.host + user.photourl: ''} alt=''/>
                     <div>
                         <h3>{user? user.name: ''}</h3>
                         <span>{user? user.email: ''}</span>

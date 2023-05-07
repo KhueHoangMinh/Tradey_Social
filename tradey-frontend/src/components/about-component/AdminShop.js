@@ -2,7 +2,6 @@ import React,{useEffect, useState} from 'react'
 import styled from 'styled-components'
 import Item from './Item'
 import Axios from 'axios'
-import Resizer from 'react-image-file-resizer'
 import { useSelector } from 'react-redux'
 
 function AdminShop() {

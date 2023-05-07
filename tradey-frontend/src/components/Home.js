@@ -24,17 +24,17 @@ const HomePage = styled.div`
 position: relative;
 display: grid;
 grid-template-columns: 1fr 2fr 1fr;
-padding: 20px;
-gap: 20px;
-top: 80px;
+padding: 20px 0;
+margin-top: 80px;
 transition: 0.2s;
 background-image: radial-gradient(farthest-corner at 75% 70%, rgb(20,20,20), rgb(25,25,25));
-min-height: calc(100vh - 80px);
-height: fit-content;
+height: calc(100vh - 120px);
+width: 100vw;
 color: rgb(230,230,230);
 @media (max-width: 1200px) {
   display: flex;
   flex-direction: column;
+  height: fit-content;
 }
 `
 
