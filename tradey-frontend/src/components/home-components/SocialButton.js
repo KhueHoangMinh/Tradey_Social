@@ -6,22 +6,22 @@ function ReactButton(props) {
         <ReactButtonStyle>
             <div className='react-btns'>
                 <div className='other-reacts'>
-                    <button onClick={()=>props.handleLike('like')} className={props.liked && props.liked.type == 'like' ? `other like liked`:'other like'}>
+                    <button onClick={()=>props.handleLike('like')} className={props.liked && props.liked.type === 'like' ? `other like liked`:'other like'}>
                         <img src='/images/like.svg' alt=''/>
                     </button>
-                    <button onClick={()=>props.handleLike('love')} className={props.liked && props.liked.type == 'love' ? `other love liked`:'other love'}>
+                    <button onClick={()=>props.handleLike('love')} className={props.liked && props.liked.type === 'love' ? `other love liked`:'other love'}>
                         <img src='/images/love.svg' alt=''/>
                     </button>
-                    <button onClick={()=>props.handleLike('haha')} className={props.liked && props.liked.type == 'haha' ? `other haha liked`:'other haha'}>
+                    <button onClick={()=>props.handleLike('haha')} className={props.liked && props.liked.type === 'haha' ? `other haha liked`:'other haha'}>
                         <img src='/images/haha.svg' alt=''/>
                     </button>
-                    <button onClick={()=>props.handleLike('wow')} className={props.liked && props.liked.type == 'wow' ? `other wow liked`:'other wow'}>
+                    <button onClick={()=>props.handleLike('wow')} className={props.liked && props.liked.type === 'wow' ? `other wow liked`:'other wow'}>
                         <img src='/images/wow.svg' alt=''/>
                     </button>
-                    <button onClick={()=>props.handleLike('sad')} className={props.liked && props.liked.type == 'sad' ? `other sad liked`:'other sad'}>
+                    <button onClick={()=>props.handleLike('sad')} className={props.liked && props.liked.type === 'sad' ? `other sad liked`:'other sad'}>
                         <img src='/images/sad.svg' alt=''/>
                     </button>
-                    <button onClick={()=>props.handleLike('angry')} className={props.liked && props.liked.type == 'angry' ? `other angry liked`:'other angry'}>
+                    <button onClick={()=>props.handleLike('angry')} className={props.liked && props.liked.type === 'angry' ? `other angry liked`:'other angry'}>
                         <img src='/images/angry.svg' alt=''/>
                     </button>
                 </div>
@@ -64,7 +64,7 @@ function CommentButton(props) {
         <ReactButtonStyle>
             <button onClick={()=>props.handleComment()} className={`comment ${props.openning ? `openning`:``}`}>
                 <img src='/images/comment.svg' alt=''/>
-                <span>{calcCmtQuant(props.comments)} {props.text != 'reply' ? (<>{props.text}{calcCmtQuant(props.comments) > 1 ? 's':''}</>):(<>{calcCmtQuant(props.comments) > 1 ? 'replies':'reply'}</>)}</span>
+                <span>{calcCmtQuant(props.comments)} {props.text !== 'reply' ? (<>{props.text}{calcCmtQuant(props.comments) > 1 ? 's':''}</>):(<>{calcCmtQuant(props.comments) > 1 ? 'replies':'reply'}</>)}</span>
             </button>
         </ReactButtonStyle>
     )

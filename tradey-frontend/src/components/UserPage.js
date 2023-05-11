@@ -91,7 +91,6 @@ const ProductsPage = styled.div`
 display: flex;
 flex-direction: column;
 h2 {
-  border-bottom: 1px solid rgba(255,255,255,0.6);
 }
 `
 
@@ -187,7 +186,6 @@ display: flex;
 flex-direction: column;
 align-items: center;
 padding: 20px;
-border-bottom: 1px solid rgba(255,255,255,0.2);
 height: 35%;
 img {
     width: 150px;
@@ -219,7 +217,6 @@ flex-direction: column;
     flex-direction: column;
     margin-bottom: 30px;
     padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 `
 

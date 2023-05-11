@@ -63,7 +63,7 @@ function AdminRequest(props) {
   return (
     <div>
         {
-           loading == 1 ? (orders && orders.map((order)=>(
+           loading === 1 ? (orders && orders.map((order)=>(
                 <SingleAdminRequest
                     order = {order}
                 />

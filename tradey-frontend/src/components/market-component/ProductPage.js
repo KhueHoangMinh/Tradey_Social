@@ -22,7 +22,7 @@ function ProductPage(props) {
       setProduct(res.data[0])
       setLoading(1)
       Axios.post('/api/getuserbyid', {userId: res.data[0].seller_id})
-      .then(res1=> {
+      .then(res1 => {
         Axios.post('/api/getproductbysellerid', {userId: res.data[0].seller_id})
         .then(res2=> {
           setSeller(res1.data[0])
@@ -42,7 +42,7 @@ function ProductPage(props) {
     <div>
           <Container>
           {
-            loading == 1 ? (
+            loading === 1 ? (
             <div className='content'>
               <img className='background-image' src={product ? window.host + product.image:''} alt=''/>
               <div className='image-container'>
@@ -74,7 +74,7 @@ function ProductPage(props) {
           <More>
             <h2>More products from this shop</h2>
             {
-            loading1 == 1 ? (
+            loading1 === 1 ? (
               <div className='item-list'>
                 {productsFromShop && productsFromShop.map((item)=>(
                   <Item 

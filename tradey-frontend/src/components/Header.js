@@ -12,13 +12,12 @@ function Header() {
   const [expandNav,setExpandNav] = useState(false)
   const user = useSelector(state=>state.auth.user)
   const [storedUser, setStoredUser] = useCookies(['user'])
-
   
   useEffect(()=>{
-    if(!user || user == null || storedUser.User == 'null') {
+    if(!user || user === null || storedUser.User === 'null') {
       navigate('/')
     } else {
-      if(storedUser.User && storedUser.User != 'null') {
+      if(storedUser.User && storedUser.User !== 'null') {
         dispatch(authActions.login({user_id: storedUser.User.user_id, type: storedUser.User.type, displayName: storedUser.User.displayName, email: storedUser.User.email, photoURL: storedUser.User.photoURL}))
       } else {
         dispatch(authActions.logout())
@@ -26,6 +25,19 @@ function Header() {
       }
     }
   },[])
+
+  useEffect(()=>{
+    if(user) {
+      window.socket.on('receivenotification', (req) => {
+        if(req.receiverIds.includes(user.user_id)) {
+          if(req.type == 'message') {
+            var audio = document.getElementById('message-noti');
+            audio.play();
+          }
+        }
+      })
+    }
+  },[window.socket])
 
   const handleUserInfo = () => {
     setActive('about')
@@ -54,6 +66,7 @@ function Header() {
   return (
     <div>
       <HeaderBar>
+        <audio id='message-noti' src='/audio/message-noti.mp3' autoPlay='false' style={{display: "none"}}/>
         <Logo>
           <img src='/images/png/logo-no-background.png' alt=''/>
         </Logo>

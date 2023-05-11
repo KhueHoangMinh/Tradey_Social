@@ -43,7 +43,7 @@ function Checkout() {
             calTotal = calTotal * vouchers[i].discount/100
         }
         
-        if(calTotal != total) {
+        if(calTotal !== total) {
             setTotal(calTotal)
         }
       }
@@ -81,7 +81,7 @@ function Checkout() {
           voucher: voucher,
           paymentMethod: paymentMethod
         }).then(res=>{
-            if(res.data[0] == 'bill_created') {
+            if(res.data[0] === 'bill_created') {
                 navigate('/receipt',{state: {
                     billId: res.data[1]
                 }})

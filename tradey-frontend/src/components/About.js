@@ -1,7 +1,9 @@
 import React, {useState, useEffect} from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
+import { authActions } from '../store/auth-slice'
+import { useNavigate } from 'react-router-dom'
+import { useCookies } from 'react-cookie'
 import Logout from './about-component/Logout'
 import EditDetails from './about-component/EditDetails'
 import Posts from './about-component/Posts'
@@ -13,16 +15,28 @@ import History from './about-component/History'
 import Advertisement from './about-component/Advertisement'
 import AdminRequest from './about-component/AdminRequest'
 import { Link } from 'react-router-dom'
+import PopUp from './PopUp'
+
 
 function About() {
     const [active,setActive] = useState('logout')
+    const dispatch = useDispatch()
     const user = useSelector(state=>state.auth.user)
+    const [storedUser, setStoredUser] = useCookies(['user'])
+    const [logOutConfirm,setLogOutConfirm] = useState(false)
     const navigate = useNavigate()
-    useEffect(()=>{
-      if(!user) {
+    const handleLogout = () => {
+        dispatch(authActions.logout())
+        setStoredUser('User',null,{path: '/'})
         navigate('/')
-      }
-    },[])
+    }
+
+    
+    useEffect(()=>{
+        if(!user) {
+          navigate('/')
+        }
+    },[user])
 
     const caseByActive = () => {
         switch(active) {
@@ -44,10 +58,8 @@ function About() {
                 return (<History user={user}/>)
             case 'advertisement':
                 return (<Advertisement user={user}/>)
-            case 'logout':
-                return (<Logout/>)
             default:
-                return (<Logout/>)
+                return (<Shop user={user}/>)
         }
     }
   return (
@@ -60,24 +72,37 @@ function About() {
         </UserInfo>
         <Tabs>
             <div className='buttons'>
-                <a onClick={()=>{setActive('editDetails')}}>Edit details</a>
-                <a onClick={()=>{setActive('posts')}}>Your posts</a>
-                {user ? (user.type != 'admin' && <a onClick={()=>{setActive('shop')}}>Your shop</a>):""}
-                {user ? (user.type === 'admin' && <a onClick={()=>{setActive('adminshop')}}>Shop</a>):""}
-                {user ? (user.type === 'admin' && <a onClick={()=>{setActive('advertisement')}}>Advertisement</a>):""}
-                <a onClick={()=>{
+                <a className={active == 'editDetails' ? 'active': ''} onClick={()=>{setActive('editDetails')}}>Edit details</a>
+                <a className={active == 'posts' ? 'active': ''} onClick={()=>{setActive('posts')}}>Your posts</a>
+                {user ? (user.type !== 'admin' && <a className={active == 'shop' ? 'active': ''} onClick={()=>{setActive('shop')}}>Your shop</a>):""}
+                {user ? (user.type === 'admin' && <a className={active == 'adminShop' ? 'active': ''} onClick={()=>{setActive('adminshop')}}>Shop</a>):""}
+                {user ? (user.type === 'admin' && <a className={active == 'advertisement' ? 'active': ''} onClick={()=>{setActive('advertisement')}}>Advertisement</a>):""}
+                <a className={active == 'request' || active == 'adminrequest' ? 'active': ''} onClick={()=>{
                     if(user.type === 'admin') {
                         setActive('adminrequest')
                     } else {
                         setActive('request')
                     }
                 }}>Order requests</a>
-                {user ? (user.type != 'admin' && <a onClick={()=>{setActive('cart')}}>Your cart</a>):""}
-                {user ? (user.type != 'admin' && <a onClick={()=>{setActive('history')}}>Shopping history</a>):""}
+                {user ? (user.type !== 'admin' && <a className={active == 'cart' ? 'active': ''} onClick={()=>{setActive('cart')}}>Your cart</a>):""}
+                {user ? (user.type !== 'admin' && <a className={active == 'history' ? 'active': ''} onClick={()=>{setActive('history')}}>Shopping history</a>):""}
             </div>
-            <a className='logout' onClick={()=>{setActive('logout')}}>Log out</a>
+            <a className='logout' onClick={()=>{setLogOutConfirm(true)}}>Log out</a>
         </Tabs>
     </LeftSide>
+    {
+        logOutConfirm && 
+        <PopUp
+            close = {()=>setLogOutConfirm(false)}
+            content = {
+                <LogoutTab>
+                    <p>Are you sure that you want to log out?</p>
+                    <button onClick={()=>{handleLogout()}}>LOG OUT</button>
+                    <button className='stay' onClick={()=>{setLogOutConfirm(false)}}>STAY</button>
+                </LogoutTab>
+            }
+        />
+    }
     {
         active === 'posts'?(
             <>{caseByActive()}</>
@@ -90,6 +115,41 @@ function About() {
     </AboutPage>
   )
 }
+
+const LogoutTab = styled.div`
+display: flex;
+flex-direction: column;
+align-items: center;
+
+button {
+    width: 90%;
+    background-color: rgba(255,0,0,0.6);
+    color: rgb(230,230,230);
+    padding: 8px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 5px 5px 8px rgba(0,0,0,0.6);
+    transition: 0.3s ease-in-out;
+    &:hover {
+        cursor: pointer;
+        background-color: rgba(255,0,0,0.9);
+    }
+}
+
+.stay {
+    background-color: rgba(255,255,255,0.3);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.6);
+    &:hover {
+        background-color: white;
+        color: black;
+    }
+}
+`
 
 const AboutPage = styled.div`
 position: relative;
@@ -153,7 +213,6 @@ display: flex;
 flex-direction: column;
 align-items: center;
 padding: 20px;
-border-bottom: 1px solid rgba(255,255,255,0.2);
 height: 35%;
 img {
     width: 150px;
@@ -177,15 +236,19 @@ flex-direction: column;
         padding: 5px 10px;
         background-color: rgba(255,255,255,0.1);
         transition: 0.2s ease-in-out;
+        user-select: none;
         &:hover, .active {
+            cursor: pointer;
             background-color: rgba(255,255,255,0.2);
         }
+    }
+    a.active {
+        background-color: rgba(255,255,255,0.2);
     }
     display: flex;
     flex-direction: column;
     margin-bottom: 30px;
     padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 .logout {
     position: relative;
@@ -194,8 +257,12 @@ flex-direction: column;
     padding: 5px 10px;
     background-color: rgba(255,0,0,0.1);
     &:hover, .active {
+        cursor: pointer;
         background-color: rgba(255,0,0,0.2);
     }
+}
+.logout.active {
+    background-color: rgba(255,0,0,0.2);
 }
 `
 

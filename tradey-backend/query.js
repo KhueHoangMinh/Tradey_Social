@@ -1,7 +1,7 @@
 const allSQL = [
     // "INSERT INTO `users` (name,email,photoURL,password) VALUES (?,?,?,?)",
     // "INSERT INTO `users` (type,name,email,photoURL,password) VALUES (?,?,?,?,?)",
-    // "SELECT user_id, type, name, email, photoURL FROM `users` where `users`.`email` = ? AND `users`.`password` = ? AND `users`.`type` != 'googleuser'",
+    // "SELECT user_id, type, name, email, photoURL FROM `users` where `users`.`email` = ? AND `users`.`password` = ? AND `users`.`type` !== 'googleuser'",
     // 'SELECT user_id, type, name, email, photoURL FROM `users` where `users`.`email` = ?',
     // 'INSERT INTO `posts` (publisher_id, time, description, image, video) VALUES (?,?,?,?,?)',
     // "SELECT * FROM `posts` JOIN `users` ON `posts`.`publisher_id` = `users`.`user_id` ORDER BY `posts`.`time` DESC",

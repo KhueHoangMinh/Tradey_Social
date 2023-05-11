@@ -36,7 +36,7 @@ function Receipt(props) {
             calTotal = calTotal * vouchers[i].discount/100
         }
         
-        if(calTotal != total) {
+        if(calTotal !== total) {
             setTotal(calTotal)
         }
       }
@@ -66,7 +66,7 @@ function Receipt(props) {
     return(
         <ReceiptStyle>
             {
-                loading == 1 ? (
+                loading === 1 ? (
                     <>
                         <h1>Receipt</h1>
                         <div className='delivery-info'>

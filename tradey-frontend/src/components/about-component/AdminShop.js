@@ -99,7 +99,6 @@ const AddPage = styled.div`
 display: flex;
 flex-direction: column;
 h2 {
-  border-bottom: 1px solid rgba(255,255,255,0.6);
 }
 .new-product-info {
   display: flex;
@@ -145,7 +144,6 @@ const ProductsPage = styled.div`
 display: flex;
 flex-direction: column;
 h2 {
-  border-bottom: 1px solid rgba(255,255,255,0.6);
 }
 `
 

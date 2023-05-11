@@ -141,7 +141,7 @@ position: relative;
 width: 100%;
 height: fit-content;
 border-radius: 10px;
-box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
+box-shadow: 5px 5px 5px rgba(0,0,0,0.4);
 overflow: hidden;
 transition: 0.2s ease-in-out;
 display: flex;
@@ -206,10 +206,11 @@ img {
 `
 
 const LeftSideStyle = styled.div`
+overflow: visible;
 overflow-y: scroll;
-overflow-x: visible;
-height: calc()(100vh - 40px);
-padding: 0 20px;
+height: calc(100vh - 120px);
+width: calc(100% - 20px);
+padding: 0 10px;
 ::-webkit-scrollbar {
   display: none;
 }
@@ -223,7 +224,7 @@ padding: 0 20px;
 const Panel = styled.form`
 background-color: rgb(10,10,10);
 border-radius: 10px;
-box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
+box-shadow: 5px 5px 5px rgba(0,0,0,0.4);
 padding: 30px;
 display: flex;
 flex-direction: column;

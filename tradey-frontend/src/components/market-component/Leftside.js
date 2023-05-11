@@ -84,7 +84,6 @@ h2 {
   text-align: center;
   width: 100%;
   margin: 0px;
-  border-bottom: 1px solid rgba(255,255,255,0.6);
   padding-bottom: 5px;
   color: rgb(51,255,255);
   letter-spacing: 3px;

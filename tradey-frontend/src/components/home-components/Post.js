@@ -22,7 +22,7 @@ function Post(props) {
     const [loading,setLoading] = useState(1)
 
     useEffect(()=>{
-        if(props.contentType != 'shared') {
+        if(props.contentType !== 'shared') {
             setLoading(0)
             Axios.post('/api/getpostbypostid', {postId: props.id})
             .then(res=>{
@@ -49,7 +49,7 @@ function Post(props) {
             props.setShowingShareInput(null)
             setShowComments(!showComments)
         } else {
-            if(props.showingCommentInput == props.id) {
+            if(props.showingCommentInput === props.id) {
                 setShowComments(!showComments)
             } else {
                 props.setShowingCommentInput(props.id)
@@ -60,7 +60,7 @@ function Post(props) {
 
     const handleShare = () => {
         setShowComments(false)
-        if(props.showingShareInput == props.id) {
+        if(props.showingShareInput === props.id) {
             props.setShowingShareInput(null)
         } else {
             props.setShowingShareInput(props.id)
@@ -69,7 +69,7 @@ function Post(props) {
     }
 
     useEffect(()=>{
-        if(props.contentType != 'shared') {
+        if(props.contentType !== 'shared') {
             Axios.post('/api/getcomments',{id: props.id})
             .then(res=>{
                 setComments(res.data)
@@ -78,7 +78,7 @@ function Post(props) {
     },[cmtChange])
 
     useEffect(()=>{
-        if(props.contentType != 'shared') {
+        if(props.contentType !== 'shared') {
             Axios.post('/api/getlikes',{id: props.id})
             .then(res=>{
                 setLikes(res.data)
@@ -92,7 +92,7 @@ function Post(props) {
                     {react: 'angry',quant: 0}
                 ]
                 for(var i = 0; i < res.data.length; i++) {
-                    if(res.data[i].liker_id == props.userId) {
+                    if(res.data[i].liker_id === props.userId) {
                         setLiked(res.data[i])
                     }
                     switch(res.data[i].type) {
@@ -129,50 +129,50 @@ function Post(props) {
   return (
     <div>
         {
-            loading == 1 ? (
+            loading === 1 ? (
                 <Panel className='user-post'>
                     <div className='userinfo'>
-                      <img className='user-image' src={props.contentType != 'shared' ? (postContent && (postContent.photourl ? window.host + postContent.photourl : '/images/user.png')) : (props.photoURL ? (window.host + props.photoURL) : '/images/user.png')} alt=''/>
+                      <img className='user-image' crossOrigin='anonymous' src={props.contentType !== 'shared' ? (postContent && (postContent.photourl ? window.host + postContent.photourl : '/images/user.png')) : (props.photoURL ? (window.host + props.photoURL) : '/images/user.png')} alt=''/>
                       <div>
-                        <h3 onClick={handleNav}>{props.contentType != 'shared' ? (postContent && postContent.name) : props.displayName}</h3>
-                        <span>{props.contentType != 'shared' ? (postContent && postContent.email) : props.email}</span>
-                        <span>{props.contentType != 'shared' ? (postContent && postContent.time) : props.time}</span>
+                        <h3 onClick={handleNav}>{props.contentType !== 'shared' ? (postContent && postContent.name) : props.displayName}</h3>
+                        <span>{props.contentType !== 'shared' ? (postContent && postContent.email) : props.email}</span>
+                        <span>{props.contentType !== 'shared' ? (postContent && postContent.time) : props.time}</span>
                       </div>
                     </div>
                     <div className='post-text'>
-                        <span>{props.contentType != 'shared' ? (postContent && postContent.description) : props.description}</span>
+                        <span>{props.contentType !== 'shared' ? (postContent && postContent.description) : props.description}</span>
                     </div>
         
                     
                     {
-                        (postContent && postContent.type) == 'share' || props.type == 'share' ? (
+                        (postContent && postContent.type) === 'share' || props.type === 'share' ? (
                             <div className='content'>
                                 {
-                                    props.contentType != 'shared' ? (postContent &&  postContent.sharedContent && <Post
+                                    props.contentType !== 'shared' ? (postContent &&  postContent.sharedContent && <Post
                                         userId = {props.user_id}
-                                        id = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.post_id) : props.sharedContent.post_id}
-                                        displayName = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.name) : props.sharedContent.name}
-                                        email = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.email) : props.sharedContent.email}
-                                        photoURL = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.photourl) : props.sharedContent.photourl}
-                                        time = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.time) : props.sharedContent.time}
-                                        description = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.description) : props.sharedContent.description}
-                                        content = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.content) : props.sharedContent.content}
-                                        type = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.type) : props.sharedContent.type}
-                                        sharedContent = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.sharedContent) : (props.sharedContent.sharedContent)}
+                                        id = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.post_id) : props.sharedContent.post_id}
+                                        displayName = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.name) : props.sharedContent.name}
+                                        email = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.email) : props.sharedContent.email}
+                                        photoURL = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.photourl) : props.sharedContent.photourl}
+                                        time = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.time) : props.sharedContent.time}
+                                        description = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.description) : props.sharedContent.description}
+                                        content = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.content) : props.sharedContent.content}
+                                        type = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.type) : props.sharedContent.type}
+                                        sharedContent = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.sharedContent) : (props.sharedContent.sharedContent)}
                                         showingCommentInput = {props.showingCommentInput}
                                         setShowingCommentInput = {props.setShowingCommentInput}
                                         contentType = 'shared'
                                     />) : (props.sharedContent && <Post
                                         userId = {props.user_id}
-                                        id = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.post_id) : props.sharedContent.post_id}
-                                        displayName = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.name) : props.sharedContent.name}
-                                        email = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.email) : props.sharedContent.email}
-                                        photoURL = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.photourl) : props.sharedContent.photourl}
-                                        time = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.time) : props.sharedContent.time}
-                                        description = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.description) : props.sharedContent.description}
-                                        content = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.content) : props.sharedContent.content}
-                                        type = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.type) : props.sharedContent.type}
-                                        sharedContent = {props.contentType != 'shared' ? (postContent && postContent.sharedContent.sharedContent) : (props.sharedContent.sharedContent)}
+                                        id = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.post_id) : props.sharedContent.post_id}
+                                        displayName = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.name) : props.sharedContent.name}
+                                        email = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.email) : props.sharedContent.email}
+                                        photoURL = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.photourl) : props.sharedContent.photourl}
+                                        time = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.time) : props.sharedContent.time}
+                                        description = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.description) : props.sharedContent.description}
+                                        content = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.content) : props.sharedContent.content}
+                                        type = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.type) : props.sharedContent.type}
+                                        sharedContent = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.sharedContent) : (props.sharedContent.sharedContent)}
                                         showingCommentInput = {props.showingCommentInput}
                                         setShowingCommentInput = {props.setShowingCommentInput}
                                         contentType = 'shared'
@@ -182,7 +182,7 @@ function Post(props) {
                         ) : (
                         <div className='content'>
                             {   
-                                props.contentType != 'shared' ?
+                                props.contentType !== 'shared' ?
                                 (postContent && (postContent.content && postContent.content.map((content) => (
                                     <img className='posted-image' src={window.host + content.link} alt=''/>
                                 )))) : 
@@ -194,7 +194,7 @@ function Post(props) {
                         )
                     }
                     {
-                        postContent && props.contentType != 'shared' &&
+                        postContent && props.contentType !== 'shared' &&
                         <>
                             <div className='social'>
                                 <div className='social-buttons'>
@@ -213,11 +213,11 @@ function Post(props) {
                                     <ShareButton
                                         handleShare = {handleShare}
                                         shares = {shares}
-                                        openning = {props.showingShareInput == props.id ? true : false}
+                                        openning = {props.showingShareInput === props.id ? true : false}
                                     />
                                 </div>
                                 {
-                                    props.showingShareInput == props.id &&
+                                    props.showingShareInput === props.id &&
                                         <ShareBox
                                             postId = {props.id}
                                             userId = {props.userId}
@@ -248,40 +248,42 @@ function Post(props) {
 const Panel = styled.div`
 background-color: rgb(10,10,10);
 border-radius: 10px;
-box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
+box-shadow: 5px 5px 5px rgba(0,0,0,0.4);
 padding: 30px;
 margin-bottom: 20px;
 .userinfo {
-display: flex;
-flex-direction: row;
-margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
 
-div{
-display: flex;
-flex-direction: column;
-h3 {
-  padding: 0;
-  margin: 0;
-  margin-bottom: 5px;
-}
+    div{
+    display: flex;
+    flex-direction: column;
+    h3 {
+    padding: 0;
+    margin: 0;
+    margin-bottom: 5px;
+    }
 
-span {
-  color: rgb(180,180,180);
-  font-size: 13px;
-}
-}
-img {
-height: 50px;
-width: 50px;
-border-radius: 50%;
-margin-right: 10px;
-}
+    span {
+    color: rgb(180,180,180);
+    font-size: 13px;
+    }
+    }
+    img {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+    }
 }
 .post-text {
 margin-bottom: 20px;
 }
 .content {
 width: 100%;
+padding: 20px;
+margin-left:-20px;
 border-radius: 10px;
 overflow:hidden;
 .posted-image {

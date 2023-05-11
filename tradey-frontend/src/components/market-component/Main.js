@@ -14,7 +14,7 @@ function Main(props) {
     <div>
       <Panel>
         {
-        props.loading == 1 ? (<div className='item-list'>
+        props.loading === 1 ? (<div className='item-list'>
           {
             props.marketItemList.map((item)=>(
               <Item 

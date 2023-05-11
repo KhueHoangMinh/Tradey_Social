@@ -25,7 +25,7 @@ function Login() {
         e.preventDefault()
         Axios.post('/api/login', {email: username, password: password})
         .then(res=>{
-            if(res.data.rows.length == 1) {
+            if(res.data.rows.length === 1) {
                 const userData = {user_id: res.data.rows[0].user_id, type: res.data.rows[0].type, displayName: res.data.rows[0].name, email: res.data.rows[0].email, photoURL: res.data.rows[0].photourl}
                 dispatch(authActions.login(userData))
                 setStoredUser('User',userData,{path: '/'})
@@ -39,7 +39,7 @@ function Login() {
     signInWithPopup(auth,provider).then((result)=>{
         Axios.post('/api/googlelogin', {email: result.user.email})
         .then(res=>{
-            if(res.data.rows.length == 1) {
+            if(res.data.rows.length === 1) {
                 const userData = {user_id: res.data.rows[0].user_id, type: res.data.rows[0].type, displayName: res.data.rows[0].name, email: res.data.rows[0].email, photoURL: res.data.rows[0].photourl}
                 dispatch(authActions.login(userData))
                 setStoredUser('User',userData,{path: '/'})
@@ -55,8 +55,9 @@ function Login() {
   }
 
   useEffect(()=>{
-    if(storedUser.User && storedUser.User != 'null') {
+    if(storedUser.User && storedUser.User !== 'null') {
       dispatch(authActions.login({user_id: storedUser.User.user_id, type: storedUser.User.type, displayName: storedUser.User.displayName, email: storedUser.User.email, photourl: storedUser.User.photoURL}))
+      window.socket.emit('online')
     } else {
       setStoredUser('User',null,{path: '/'})
       dispatch(authActions.logout())
@@ -84,8 +85,8 @@ function Login() {
                     <label>Password:</label>
                     <input className='inputfield' type='password' value={password} onChange={(e)=>{setPassword(e.target.value)}}/>
                 </div>
-                    {errors == 'no_match' ? <Error>Email or password does not match.</Error>:<></>}
-                    {errors == 'no_account' ? <Error>No account with this email exists.</Error>:<></>}
+                    {errors === 'no_match' ? <Error>Email or password does not match.</Error>:<></>}
+                    {errors === 'no_account' ? <Error>No account with this email exists.</Error>:<></>}
                 <div className='login-btns'>
                     <button className='normal-login' type='submit'>Login</button>
                     <button className='google-login' type='button' onClick={handleGoogleLogin}><img src='/images/google-logo.svg'/><span>Login with Google</span></button>

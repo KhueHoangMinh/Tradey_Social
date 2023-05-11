@@ -2,6 +2,7 @@ import Axios from 'axios'
 import React, {useState} from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
+import PopUp from '../PopUp'
 
 function Item(props) {
   const [editting, setEditting] = useState(false)
@@ -9,6 +10,8 @@ function Item(props) {
   const [description,setDescription]= useState()    
   const [price,setPrice]= useState()    
   const [image,setImage]= useState()  
+  const [openDelete,setOpenDelete] = useState(null)
+  const [openEdit,setOpenEdit] = useState(null)
 
   
   const navigate = useNavigate()
@@ -31,10 +34,15 @@ function Item(props) {
 
   const handleDelete = () => {
     Axios.post('/api/deleteproduct',{productId: props.productId})
+    .then(res=>{
+      if(props.setReload) props.setReload(!props.reload)
+    })
   }
   
   
-  const handleSave = () => {
+  const handleSave = (e) => {
+    e.preventDefault()
+
     var lastSlash = props.productImage.length - 1
     var imageName = ''
     for(let i = lastSlash; i >= 0; i--) {
@@ -67,51 +75,171 @@ function Item(props) {
           <img className='background-image' src={window.host + props.productImage} alt=''/>
           <div className='left-info'>
             <div className='info'>
-              {!editting ? (<h2 onClick={handleNav} className='name'>{name?name:props.productName}</h2>):(<input type='text' value={name} onChange={(e)=>setName(e.target.value)}/>)}
+              <h2 onClick={handleNav} className='name'>{name?name:props.productName}</h2>
             </div>
             <div className='info'>
-              {!editting ? (<span className='desc'>{description?description:props.productDescription}</span>):(<input type='text' value={description} onChange={(e)=>setDescription(e.target.value)}/>)}
+              <p className='desc'>{description?description:props.productDescription}</p>
             </div>
             <div className='info'>
-              {!editting ? (<span className='price'>${price?price:props.productPrice}</span>):(<input type='number' value={price} onChange={(e)=>setPrice(e.target.value)}/>)}
+             <span className='price'>${price?price:props.productPrice}</span>
             </div>
-            {props.type != 3 && props.type != 4 ? 
-            (
-              <div className='info'>
-                {!editting ? (<span className='image'>{props.productImage}</span>):(<input type='file' onChange={(e)=>setImage(e.target.files[0])}/>)}
-              </div>
-            )
-            :
-            (
-              <div className='quantity'>
-                {props.type == 3 ? <button className='quant-btn'>-</button> : ''}
+            <div className='btns'>
+              {props.type === 3 || props.type === 4 &&
+              <>
+                {props.type === 3 ? <button className='quant-btn'>-</button> : ''}
                 x{props.quantity ? props.quantity : 'NaN'}
-                {props.type == 3 ? <button className='quant-btn'>+</button> : ''}
-              </div>
-            )
-          }
+                {props.type === 3 ? <button className='quant-btn'>+</button> : ''}
+              </>
+              }
+              {props.type === 1 &&
+              <>
+                <button className='edit-btn delete' onClick={()=>{setOpenDelete(props.productId)}}>Delete</button>
+                <button className='edit-btn' onClick={()=>{setOpenEdit(props.productId)}}>Edit</button>
+              </>
+              }
+            </div>
           </div>
         </div>
-        <div>
-          {props.type !== 3 && props.type !== 4 ? 
-            (editting ? (
-                <>
-                  <a className='edit-btn' onClick={()=>handleCancel()}>Cancel</a>
-                  <a className='edit-btn' onClick={handleSave}>Save</a>
-                </>
-              ):(
-                <>
-                  <a className='edit-btn' onClick={handleDelete}>Delete</a>
-                  <a className='edit-btn' onClick={()=>setEditting(true)}>Edit</a>
-                </>
-            )
-            )
-            :''
-          }
-        </div>
+        {
+          openDelete &&
+          <PopUp
+            close = {()=>setOpenDelete(null)}
+            content = {
+              <DeleteTab>
+                  <p>Are you sure that you want delete?</p>
+                  <button onClick={()=>{
+                    handleDelete(openDelete)
+                    setOpenDelete(null)
+                    }}>DELETE</button>
+                  <button className='stay' onClick={()=>{setOpenDelete(null)}}>CANCEL</button>
+              </DeleteTab>
+            }
+          />
+        }
+        {
+          openEdit &&
+          <PopUp
+            close = {()=>setOpenEdit(null)}
+            content = {
+              <EditPage  onSubmit={e=>handleSave(e)}>
+                <h2>Edit product</h2>
+                <div className='new-product-info'>
+                  <div className='product-info'>
+                    <label>Name:</label>
+                    <input type='text' onChange={(e)=>{setName(e.target.value)}}/>
+                  </div>
+                  <div className='product-info'>
+                    <label>Description:</label>
+                    <textarea type='text' onChange={(e)=>{setDescription(e.target.value)}}/>
+                  </div>
+                  <div className='product-info'>
+                    <label>Price($):</label>
+                    <input type='number' onChange={(e)=>{setPrice(e.target.value)}}/>
+                  </div>
+                  <div className='product-info'>
+                    <label>Image:</label>
+                    <input type='file' onChange={(e)=>{setImage(e.target.files[0])}}/>
+                  </div>
+                </div>
+                <div className='btn-box'>
+                  <button type='submit' className='add-btn'>Edit</button>
+                </div>
+              </EditPage>
+            }
+          />
+        }
       </ItemPanel>
     )
   }
+
+  const EditPage = styled.form`
+display: flex;
+flex-direction: column;
+h2 {
+  text-align: center;
+}
+.new-product-info {
+  display: flex;
+  flex-direction: column;
+  .product-info {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    margin: 10px 0;
+    textarea {
+      height: 100px;
+    }
+    input,textarea {
+      background-color: rgba(255,255,255,0.15);
+      border: none;
+      outline: none;
+      border-radius: 5px;
+      color: white;
+    }
+    label {
+      color: white;
+      font-weight: 600;
+    }
+  }
+}
+.btn-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  .add-btn {
+    width: fit-content;
+    margin: 0 auto;
+    margin: 10px 0;
+    padding: 5px 20px;
+    font-weight: 600;
+    font-size: 20px;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    background-color: transparent;
+    transition: 0.2s ease-in-out;
+    &:hover {
+      cursor: pointer;
+      background-color: white; 
+      color: black;
+    }
+  }
+}
+`
+  
+  const DeleteTab = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  button {
+      width: 90%;
+      background-color: rgba(255,0,0,0.6);
+      color: rgb(230,230,230);
+      padding: 8px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      border: none;
+      box-shadow: 5px 5px 8px rgba(0,0,0,0.6);
+      transition: 0.3s ease-in-out;
+      &:hover {
+          cursor: pointer;
+          background-color: rgba(255,0,0,0.9);
+      }
+  }
+  
+  .stay {
+      background-color: rgba(255,255,255,0.3);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.6);
+      &:hover {
+          background-color: white;
+          color: black;
+      }
+  }
+  `
   
   const ItemPanel = styled.div`
   display: flex;
@@ -156,7 +284,7 @@ function Item(props) {
       justify-content: space-between;
       padding: 10px;
       overflow-x: hidden;
-      .quantity {
+      .btns {
         padding: 10px 5px;
         background-color: black;
         color: white;
@@ -182,7 +310,37 @@ function Item(props) {
           border-radius: 3px;
           transition: 0.2s ease-in-out;
           &:hover {
+            cursor: pointer;
             background-color: white;
+            color: black;
+          }
+        }
+        .edit-btn {
+          margin: 0 5px;
+          padding: 5px 3px;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+          font-weight: 600;
+          background-color: rgba(255,255,255,0.1);
+          color: white;
+          border: 1px solid rgba(255,255,255,0.5);
+          border-radius: 8px;
+          transition: 0.2s ease-in-out;
+          &:hover {
+            cursor: pointer;
+            background-color: white;
+            color: black;
+          }
+        }
+        .delete {
+          background-color: rgba(255,0,0,0.1);
+          border: 1px solid rgba(255,0,0,0.5);
+          color: red;
+          &:hover {
+            background-color: red;
             color: black;
           }
         }
@@ -201,6 +359,8 @@ function Item(props) {
           }
         }
         .desc {
+          padding: 0;
+          margin: 0;
           text-align: justify;
           line-height: 20px;
           height: 40px;
@@ -227,18 +387,6 @@ function Item(props) {
     }
   }
 
-  .edit-btn {
-    font-weight: 600;
-    color: rgba(255,255,255,0.6);
-    transition: 0.2s ease-in-out;
-    height: 30px;
-    width: 40px;
-    margin-left: 20px;
-    &:hover {
-      color: rgba(255,255,255,1);
-      cursor: default;
-    }
-  }
   `
 
 export default Item

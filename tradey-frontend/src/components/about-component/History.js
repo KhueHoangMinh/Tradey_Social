@@ -67,7 +67,7 @@ function History() {
 
   return (
     <HistoryPanel>
-      {loading == 1 ? (bills && bills.map((bill) => (
+      {loading === 1 ? (bills && bills.map((bill) => (
         <Bill bill={bill}/>
       ))) : <Loading></Loading>}
     </HistoryPanel>
@@ -106,7 +106,6 @@ const BillPanel = styled.div`
 display: flex;
 flex-direction: column;
 padding-bottom: 10px;
-border-bottom:  1px solid rgba(255,255,255,0.5);
 `
 
 const GeneralDetails = styled.div`
@@ -135,7 +134,6 @@ const ShopBill = styled.div`
 display: flex;
 flex-direction: column;
 h2 {
-  border-bottom: 1px solid rgba(255,255,255,0.5);
 }
 .item-list {
   display: flex;
@@ -144,7 +142,6 @@ h2 {
 `
 
 const Total = styled.div`
-border-top: 1px solid rgba(255,255,255,0.5);
 margin-top: 10px;
 display: flex;
 flex-direction: row;

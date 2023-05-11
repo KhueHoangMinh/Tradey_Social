@@ -16,7 +16,7 @@ function Posts(props) {
   return (
     <div className='posts'>
       {
-        loading == 1 ? (posts.map((post)=>(
+        loading === 1 ? (posts.map((post)=>(
           <Post
           userId = {props.user.user_id}
           id = {post ? post.post_id:''}

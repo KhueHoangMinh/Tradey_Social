@@ -33,7 +33,7 @@ function Cart() {
     <div>
       <CartPanel>
         {
-          loading == 1 ? (<>
+          loading === 1 ? (<>
           <MarketCart>
             <h2>Shopping Cart</h2>
             <div className='item-list'>

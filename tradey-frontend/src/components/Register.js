@@ -24,7 +24,7 @@ function Register() {
     const handleRegister = () => {
         Axios.post('/api/register', {type: "user", name: username, email: email, photoURL: photoURL, password: password})
         .then(res=>{
-            if(res.data == 'existed') {
+            if(res.data === 'existed') {
                 setErrors('existed')
             } else {
                 navigate('/')
@@ -36,7 +36,7 @@ function Register() {
     signInWithPopup(auth,provider).then((result)=>{
         Axios.post('/api/register', {type: "googleuser", name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL, password: 'google'})
         .then(res=>{
-            if(res.data == 'existed') {
+            if(res.data === 'existed') {
                 setErrors('existed')
             } else {
                 navigate('/')
@@ -64,7 +64,7 @@ function Register() {
                         <label>Password:</label>
                         <input className='inputfield' type='password' value={password} onChange={(e)=>{setPassword(e.target.value)}}/>
                     </div>
-                    {errors == 'existed' ? <Error>An account with this email already existed, please loggin.</Error>:<></>}
+                    {errors === 'existed' ? <Error>An account with this email already existed, please loggin.</Error>:<></>}
                     <div className='login-btns'>
                         <button className='normal-login' onClick={handleRegister}>Register</button>
                         <button className='google-login' onClick={handleGoogleRegister}><img src='/images/google-logo.svg'/><span>Register with Google</span></button>

@@ -6,7 +6,7 @@ function CommentInput(props) {
     return (
         <InputStyle>
             {
-                props.showingCommentInput == props.commentFor ? (
+                props.showingCommentInput === props.commentFor ? (
                     <form onSubmit={e=>props.handleComment(e)} className='input-comment'>
                         <input type='text' placeholder={props.text} value={props.comment} onChange={(e)=>{
                             e.preventDefault()

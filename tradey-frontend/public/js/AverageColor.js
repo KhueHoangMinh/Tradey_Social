@@ -46,9 +46,9 @@ while ( (i += blockSize * 4) < length ) {
 }
 
 // ~~ used to floor values
-rgb.r = ~~(rgb.r/count*15/100);
-rgb.g = ~~(rgb.g/count*15/100);
-rgb.b = ~~(rgb.b/count*15/100);
+rgb.r = ~~(rgb.r/count*30/100);
+rgb.g = ~~(rgb.g/count*30/100);
+rgb.b = ~~(rgb.b/count*30/100);
 
 return rgb;
 

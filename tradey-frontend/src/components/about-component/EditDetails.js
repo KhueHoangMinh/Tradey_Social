@@ -68,7 +68,7 @@ function EditDetails(props) {
             </div>
         </form>
         {
-            props.user.type != 'googleuser' &&
+            props.user.type !== 'googleuser' &&
             <form className='info'>
                 <div className='editable'>
                     <label>Password:</label>

@@ -132,7 +132,7 @@ function Request(props) {
   return (
     <div>
       {
-      loading == 1? (orders.map((order)=>(
+      loading === 1? (orders.map((order)=>(
           <SingleRequest
               order = {order}
           />

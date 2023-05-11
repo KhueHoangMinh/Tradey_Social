@@ -18,7 +18,7 @@ function Item(props) {
         <div className='item-info'>
           <div className='item-top'>
             {
-              props.type == 'shop' ? (
+              props.type === 'shop' ? (
                 <div className='admin-product'>
                   Admin
                 </div>

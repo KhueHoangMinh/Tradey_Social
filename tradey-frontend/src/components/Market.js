@@ -13,6 +13,7 @@ function Market() {
   const [marketPage,setMarketPage] = useState(1)
   const [displayMarket,setDisplayMarket] = useState([])
   const [marketPageTotal, setMarketPageTotal] = useState(0)
+  var prevPage = 1
 
   useEffect(()=>{
     Axios.get('/api/getmarket')
@@ -23,7 +24,7 @@ function Market() {
   },[])
   const navigate = useNavigate()
   useEffect(()=>{
-    if(user == null) {
+    if(user === null) {
       navigate('/')
     }
   },[])
@@ -65,22 +66,41 @@ function Market() {
         marketItems.push(marketItemList[i])
       }
     }
-    setDisplayMarket(marketItems)
+    setDisplayMarket((items) =>{
+      if(marketPage == prevPage) {
+        return marketItems
+      } else {
+        return items
+      }
+    })
   },[marketItemList])
 
   const handleMarketPage = (page) =>{
     marketItems = []
-    if(page == marketPageTotal) {
+    prevPage = marketPage
+    if(page === marketPageTotal) {
       for(var i=(page-1)*21;i<marketItemList.length;i++) {
         marketItems.push(marketItemList[i])
       }
-      setDisplayMarket(marketItems)
+      setDisplayMarket((items) =>{
+        if(marketPage == prevPage) {
+          return marketItems
+        } else {
+          return items
+        }
+      })
       return
     } else if(marketPageTotal > 0) {
       for(var i=(page-1)*21;i<(page-1)*21+21;i++) {
         marketItems.push(marketItemList[i])
       }
-      setDisplayMarket(marketItems)
+      setDisplayMarket((items) =>{
+        if(marketPage == prevPage) {
+          return marketItems
+        } else {
+          return items
+        }
+      })
     }
   }
 
@@ -90,7 +110,7 @@ function Market() {
 
   function PageBtn (i,cur,set) {
     return ( 
-      <a id={`page-btn-${i}`} className={cur == (i)?'active':'inactive'} onClick={(e)=>{
+      <a id={`page-btn-${i}`} className={cur === (i)?'active':'inactive'} onClick={(e)=>{
         e.preventDefault()
         set(i)
         }}>{i}
@@ -151,7 +171,7 @@ useEffect(()=>{
               <div className='page-btn'>
                 <a id='prev-btn' className='inactive' onClick={(e)=>{
                   e.preventDefault()
-                  if(marketPage == 1) {
+                  if(marketPage === 1) {
                     setMarketPage(marketPageTotal)
                   } else {
                     setMarketPage(marketPage - 1)
@@ -163,7 +183,7 @@ useEffect(()=>{
                 }
                 <a id='next-btn' className='inactive' onClick={(e)=>{
                   e.preventDefault()
-                  if(marketPage == marketPageTotal) {
+                  if(marketPage === marketPageTotal) {
                     setMarketPage(1)
                   } else {
                     setMarketPage(marketPage + 1)

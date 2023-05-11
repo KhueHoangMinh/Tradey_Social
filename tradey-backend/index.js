@@ -1,13 +1,11 @@
 const express = require('express')
-const mysql = require('mysql')
 const cors = require('cors')
+const http = require('http')
 const bodyParser = require('body-parser')
 const multer = require('multer')
 const path = require('path')
-const { stringify } = require('querystring')
 const {Client} = require("cassandra-driver")
-
-const HOST = 'http://localhost:3001/'
+const {Server} = require('socket.io')
 
 
 // const app = express()
@@ -29,7 +27,7 @@ async function run() {
     app.use(bodyParser.urlencoded({extended: true}))
     app.use(bodyParser.json({limit: '1mb'}))
     app.use(express.json())
-    app.use(cors())
+    app.use(cors({origin: ["http://192.168.1.7:3000","http://localhost:3000/"]}))
 
     app.use('/storage',express.static('storage'))
 
@@ -45,6 +43,62 @@ async function run() {
     })
 
     await client.connect();
+
+    const server = http.createServer(app)
+
+    const io = new Server(server, {
+        cors: {
+            origin: "http://192.168.1.7:3000",
+            methods: ["GET","POST"]
+        }
+    })
+
+    io.on("connection", socket => {
+        var prevMess = null
+
+        socket.on("joinchat", async (req) => {
+            var idArray = [req.userId, req.chatting]
+            idArray.sort((a,b) => (a > b) ? 1 : -1)
+    
+            const query = `SELECT password FROM tradey_ks.users_by_user_id WHERE user_id = ?;`
+            var rs1 = await client.execute(query,[idArray[0]])
+            var rs2 = await client.execute(query,[idArray[1]])
+    
+            var roomId = idArray[0].toString() + idArray[1].toString() + rs1.rows[0].password + rs2.rows[0].password
+    
+            socket.join(roomId)
+        })
+
+        socket.on("online", async (req) => {
+            socket.join("notifications")
+        })
+
+        socket.on("sendmessage", async (req) => {
+            var idArray = [req.userId, req.chatting]
+            idArray.sort((a,b) => (a > b) ? 1 : -1)
+
+            const insertQuery = `INSERT INTO tradey_ks.messages (sender_id,receiver_id,time,message) VALUES (?,?,toTimeStamp(now()),?);`
+    
+            const query = `SELECT password FROM tradey_ks.users_by_user_id WHERE user_id = ?;`
+            var rs1 = await client.execute(query,[idArray[0]])
+            var rs2 = await client.execute(query,[idArray[1]])
+    
+            var roomId = idArray[0].toString() + idArray[1].toString() + rs1.rows[0].password + rs2.rows[0].password
+            if(prevMess != {senderId: req.userId, receiverId: req.chatting, message: req.message, time: req.time.toString()}) {
+                socket.to(roomId).emit("receivemessage", {senderId: req.userId, receiverId: req.chatting, message: req.message, time: req.time.toString()})
+                socket.to('notifications').emit('receivenotification', {type: 'message', content: null, receiverIds: [req.chatting]})
+                await client.execute(insertQuery, [req.userId,req.chatting,req.message])
+            }
+            prevMess = {senderId: req.userId, receiverId: req.chatting, message: req.message, time: req.time.toString()}
+        })
+
+        socket.on("disconnect", ()=> {
+            console.log(`disconnected ${socket.id}`)
+        })
+    })
+
+    server.listen(3002)
+
 
     app.post('/api/register', async (req,res) => {
         const type = req.body.type
@@ -127,7 +181,7 @@ async function run() {
         console.log(type)
         var source = null
         var link = null
-        if(type == 'share') {
+        if(type === 'share') {
             source = req.body.source
         } else {
             if(req.file) {
@@ -199,7 +253,7 @@ async function run() {
     
             respondRs = {...rs.rows[0],...dataRs1.rows[0],content: dataRs2.rows}
     
-            if(dataRs2.rows.length == 1 && dataRs2.rows[0].source) {
+            if(dataRs2.rows.length === 1 && dataRs2.rows[0].source) {
                 respondRs = {...respondRs, sharedContent: await getPostByPostId(dataRs2.rows[0].source)}
             }
 
@@ -260,7 +314,7 @@ async function run() {
         const rs = await client.execute(query)
 
         for(var i = 0; i < rs.rows.length; i++) {
-            if(rs.rows[i].source == postId) {
+            if(rs.rows[i].source === postId) {
                 shares++
             }
         }
@@ -273,7 +327,7 @@ async function run() {
         const postId = req.body.postId
         const type = req.body.type
         var insertType = ''
-        if(type == 'default') {
+        if(type === 'default') {
             insertType = 'like'
         } else {
             insertType = type
@@ -282,7 +336,7 @@ async function run() {
         const selectQuery = "SELECT * FROM tradey_ks.likes_by_liker_id WHERE post_id = ? AND liker_id = ?;"
         const rs = await client.execute(selectQuery,[postId,userId])
         
-        if(rs.rows.length == 0) {
+        if(rs.rows.length === 0) {
             var insertQuery = "INSERT INTO tradey_ks.likes_by_liker_id (like_id,post_id,liker_id,time,type) VALUES (uuid(),?,?,toTimeStamp(now()),?);"
             await client.execute(insertQuery,[postId,userId,insertType])
             var likeRs = await client.execute('SELECT * FROM tradey_ks.likes_by_liker_id WHERE post_id = ? AND liker_id = ?;', [postId,userId])
@@ -290,7 +344,7 @@ async function run() {
             await client.execute(insertQuery,[likeRs.rows[0].like_id,likeRs.rows[0].post_id,likeRs.rows[0].liker_id,likeRs.rows[0].time,likeRs.rows[0].type])
             res.send('liked')
         } else {
-            if(type != 'default' && type != rs.rows[0].type) {
+            if(type !== 'default' && type !== rs.rows[0].type) {
                 var updateQuery = "UPDATE tradey_ks.likes_by_liker_id SET type = ? WHERE post_id = ? AND liker_id = ? AND time = ?;"
                 await client.execute(updateQuery,[type,postId,rs.rows[0].liker_id,rs.rows[0].time])
                 updateQuery = "UPDATE tradey_ks.likes_by_time SET type = ? WHERE post_id = ? AND time = ? AND like_id = ?;"
@@ -515,12 +569,12 @@ async function run() {
 
         switch(action) {
             case 'add':
-                if(selectRs.rows.length == 1) {
+                if(selectRs.rows.length === 1) {
                     const query = `UPDATE tradey_ks.cart SET quantity = ${(selectRs.rows[0].quantity + 1).toString()} WHERE user_id = ? ANd product_id = ?;`
                     await client.execute(query, [userId, productId])
         
                     res.send('incremented')
-                } else if(selectRs.rows.length == 0) {
+                } else if(selectRs.rows.length === 0) {
                     const query = `INSERT INTO tradey_ks.cart (product_id,user_id,quantity,time) VALUES (${productId.toString()},${userId.toString()},${quantity.toString()},toTimeStamp(now()));`
             
                     await client.execute(query)
@@ -528,12 +582,12 @@ async function run() {
                 }
                 break
             case 'dec':
-                if(selectRs.rows.length == 1 && selectRs.rows[0].quantity > 1) {
+                if(selectRs.rows.length === 1 && selectRs.rows[0].quantity > 1) {
                     const query = `UPDATE tradey_ks.cart SET quantity = ${(selectRs.rows[0].quantity - 1).toString()} WHERE user_id = ? ANd product_id = ?;`
                     await client.execute(query, [userId, productId])
         
                     res.send('decremented')
-                } else if(selectRs.rows.length == 1 && selectRs.rows[0].quantity <= 1) {
+                } else if(selectRs.rows.length === 1 && selectRs.rows[0].quantity <= 1) {
                     const query = `DELETE FROM tradey_ks.cart WHERE user_id = ? ANd product_id = ?;`
             
                     await client.execute(query,[userId,productId])
@@ -653,7 +707,7 @@ async function run() {
             for(var j = 0; j < itemRs.rows.length; j++) {
                 var productQuery = `SELECT * FROM tradey_ks.products_by_product_id WHERE product_id = ?;`
                 var productRs = await client.execute(productQuery,[itemRs.rows[j].product_id])
-                if(productRs.rows[0].seller_id == userId) {
+                if(productRs.rows[0].seller_id === userId) {
                     itemsOfSeller.push({...itemRs.rows[j],...productRs.rows[0]})
                 }
             }
@@ -707,7 +761,7 @@ async function run() {
 
     app.post('/api/getuserbyid', async (req,res)=> {
         const userId = req.body.userId
-        const query = 'SELECT name, email, photourl FROM tradey_ks.users_by_user_id WHERE user_id = ?;'
+        const query = 'SELECT type, user_id, name, email, photourl FROM tradey_ks.users_by_user_id WHERE user_id = ?;'
 
         const rs = await client.execute(query, [userId])
         res.send(rs.rows)
@@ -796,21 +850,21 @@ async function run() {
         const username = req.body.username
         const password = req.body.password
 
-        if(avatar != null) {
+        if(avatar !== null) {
             const query = `UPDATE tradey_ks.users_by_user_id SET photourl = ? WHERE user_id = ?;`
             await client.execute(query, [avatar, userId])
             const selectQuery = `SELECT type, email, password FROM tradey_ks.users_by_user_id WHERE user_id = ?`
             const selectRs = await client.execute(selectQuery, [userId])
             const query2 = `UPDATE tradey_ks.users_by_email SET photourl = ? WHERE type = ? AND email = ? AND password = ?;`
             await client.execute(query2,[avatar,selectRs.rows[0].type,selectRs.rows[0].email,selectRs.rows[0].password])
-        } else if(username != null) {
+        } else if(username !== null) {
             const query = `UPDATE tradey_ks.users_by_user_id SET name = ? WHERE user_id = ?;`
             await client.execute(query, [username, userId])
             const selectQuery = `SELECT type, email, password FROM tradey_ks.users_by_user_id WHERE user_id = ?`
             const selectRs = await client.execute(selectQuery, [userId])
             const query2 = `UPDATE tradey_ks.users_by_email SET name = ? WHERE type = ? AND email = ? AND password = ?;`
             await client.execute(query2,[username,selectRs.rows[0].type,selectRs.rows[0].email,selectRs.rows[0].password])
-        } else if (password != null) {
+        } else if (password !== null) {
             const query = `UPDATE tradey_ks.users_by_user_id SET password = ? WHERE user_id = ?;`
             await client.execute(query, [password, userId])
             const selectQuery = `SELECT type, email, password FROM tradey_ks.users_by_user_id WHERE user_id = ?`
@@ -831,7 +885,7 @@ async function run() {
         for(var i = 0; i< rs.rows.length; i++) {
             var check = true
             for(var j = 0; j < finalRs.length; j++) {
-                if(finalRs[j].product_id.toString() == rs.rows[i].product_id.toString()) {
+                if(finalRs[j].product_id.toString() === rs.rows[i].product_id.toString()) {
                     finalRs[j].quantity += rs.rows[i].quantity
                     check = false
                     break
@@ -849,6 +903,30 @@ async function run() {
             var selectRs = await client.execute(selectQuery, [finalRs[i].product_id])
             finalRs[i] = {...finalRs[i],...selectRs.rows[0]}
         }
+
+        res.send(finalRs)
+    })
+
+    app.post('/api/getusers', async (req,res) => {
+        const query = `SELECT user_id,type,name,email,photourl FROM tradey_ks.users_by_user_id;`
+
+        const rs = await client.execute(query)
+
+        res.send(rs.rows)
+    })
+
+    app.post('/api/getmessages', async (req,res) => {
+        const senderId = req.body.userId
+        const receiverId = req.body.chatting
+        var finalRs = []
+
+        const query = `SELECT * FROM tradey_ks.messages WHERE sender_id = ? AND receiver_id = ?;`
+        var rs1 = await client.execute(query, [senderId, receiverId])
+        var rs2 = await client.execute(query, [receiverId, senderId])
+
+        finalRs = [...rs1.rows, ...rs2.rows]
+
+        finalRs.sort((a,b) => (a.time > b.time) ? 1 : -1)
 
         res.send(finalRs)
     })
