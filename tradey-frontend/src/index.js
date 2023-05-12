@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import store from './store'
 import io from 'socket.io-client'
 
+// window.baseHost = 'http://127.0.0.1:5001/tradey-backend/us-central1/'
 window.baseHost = 'http://192.168.1.7'
 
 window.host = window.baseHost + ':3001/'

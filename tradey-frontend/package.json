@@ -1,7 +1,7 @@
 {
   "name": "tradey-frontend",
   "version": "0.1.0",
-  "proxy": "http://localhost:3001",
+  "proxy": "http://192.168.1.7:3001",
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.1",
