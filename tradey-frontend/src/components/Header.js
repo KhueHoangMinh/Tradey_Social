@@ -66,7 +66,7 @@ function Header() {
   return (
     <div>
       <HeaderBar>
-        <audio id='message-noti' src='/audio/message-noti.mp3' autoPlay='false' style={{display: "none"}}/>
+        <audio id='message-noti' src='/audio/message-noti.mp3' style={{display: "none"}}/>
         <Logo>
           <img src='/images/png/logo-no-background.png' alt=''/>
         </Logo>
@@ -178,6 +178,7 @@ align-items: center;
 justify-content: center;
 padding: 0 20px;
 transition: 0.2s ease-in-out;
+user-select: none;
 border-bottom: 0px solid rgb(230,230,230);
 a {
   display: flex;
@@ -208,7 +209,7 @@ a::after {
 }
 &:hover {
   background-color: rgba(255,255,255,0.2);
-  cursor: default;
+  cursor: pointer;
   a::after {
     width: calc(100% + 5px); 
     left: 0; 

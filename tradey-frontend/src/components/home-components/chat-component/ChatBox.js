@@ -204,6 +204,7 @@ bottom: 0;
                 background-color: white;
                 border-radius: 10px;
                 width: fit-content;
+                max-width: 100%;
             }
         }
         .user {

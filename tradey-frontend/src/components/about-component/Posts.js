@@ -6,6 +6,8 @@ import Loading from '../Loading'
 function Posts(props) {
   const [posts, setPosts] =  useState([])
   const [loading,setLoading] = useState(0)
+  const [showingCommentInput, setShowingCommentInput] = useState()
+  const [showingShareInput, setShowingShareInput] = useState()
   useEffect(()=>{
     Axios.post('/api/getuserposts', {userId: props.user.user_id})
     .then(res=>{
@@ -18,14 +20,13 @@ function Posts(props) {
       {
         loading === 1 ? (posts.map((post)=>(
           <Post
-          userId = {props.user.user_id}
-          id = {post ? post.post_id:''}
-          displayName = {props.user.displayName}
-          email = {props.user.email}
-          photoURL = {props.user.photoURL}
-          time = {post ? post.time:''}
-          description = {post ? post.description:''}
-          content = {post ? post.content:[]}
+          userId = {props.currentUser.user_id}
+          id = {post.post_id}
+          showingCommentInput = {showingCommentInput}
+          setShowingCommentInput = {setShowingCommentInput}
+          showingShareInput = {showingShareInput}
+          setShowingShareInput = {setShowingShareInput}
+          contentType = 'post'
           />
         ))): <Loading></Loading>
       }

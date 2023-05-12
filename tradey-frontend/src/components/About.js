@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { authActions } from '../store/auth-slice'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate,useLocation } from 'react-router-dom'
 import { useCookies } from 'react-cookie'
 import Logout from './about-component/Logout'
 import EditDetails from './about-component/EditDetails'
@@ -16,14 +16,20 @@ import Advertisement from './about-component/Advertisement'
 import AdminRequest from './about-component/AdminRequest'
 import { Link } from 'react-router-dom'
 import PopUp from './PopUp'
+import Axios from 'axios'
+import ChatBox from './home-components/chat-component/ChatBox'
 
 
 function About() {
-    const [active,setActive] = useState('logout')
+    const [active,setActive] = useState('posts')
     const dispatch = useDispatch()
-    const user = useSelector(state=>state.auth.user)
+    const currentUser = useSelector(state=>state.auth.user)
     const [storedUser, setStoredUser] = useCookies(['user'])
     const [logOutConfirm,setLogOutConfirm] = useState(false)
+    const [user,setUser] = useState()
+    const {state} = useLocation()
+    const [chatting,setChatting] = useState(null)
+    const [relationShip,setRelationship] = useState()
     const navigate = useNavigate()
     const handleLogout = () => {
         dispatch(authActions.logout())
@@ -33,8 +39,36 @@ function About() {
 
     
     useEffect(()=>{
-        if(!user) {
+        if(!currentUser) {
           navigate('/')
+        }
+        if(state && currentUser && state.userId && state.userId != currentUser.user_id) {
+            Axios.post('/api/getuserbyid', {userId: state.userId})
+            .then(res=> {
+                setUser({user_id: res.data[0].user_id, type: res.data[0].type, displayName: res.data[0].name, email: res.data[0].email, photoURL: res.data[0].photourl})
+            })
+            Axios.post('/api/checkrelationship',{userId: currentUser.user_id, friendId: state.userId})
+            .then(res=>{
+                switch(res.data) {
+                    case 'friend':
+                        setRelationship('Unfriend')
+                        break
+                    
+                    case 'requested':
+                        setRelationship('Cancel')
+                        break
+
+                    case 'pending':
+                        setRelationship('Accept')
+                        break
+
+                    case 'none':
+                        setRelationship('Add friend')
+                        break
+                }
+            })
+        } else if(!state || state.userId == currentUser.user_id) {
+            setUser(currentUser)
         }
     },[user])
 
@@ -43,11 +77,17 @@ function About() {
             case 'editDetails':
                 return (<EditDetails user={user}/>)
             case 'posts':
-                return (<Posts user={user}/>)
+                return (<Posts 
+                    user={user}
+                    currentUser = {currentUser}/>)
             case 'shop':
-                return (<Shop user={user}/>)
+                return (<Shop 
+                    user={user}
+                    currentUser = {currentUser}/>)
             case 'adminshop':
-                return (<AdminShop user={user}/>)
+                return (<AdminShop 
+                    user={user}
+                    currentUser = {currentUser}/>)
             case 'adminrequest':
                 return (<AdminRequest user={user}/>)
             case 'request':
@@ -59,36 +99,85 @@ function About() {
             case 'advertisement':
                 return (<Advertisement user={user}/>)
             default:
-                return (<Shop user={user}/>)
+                return (<Posts user={user}/>)
         }
     }
+
+    const handleAddFriend = () => {
+        if(state && currentUser && state.userId && state.userId != currentUser.user_id) {
+            Axios.post('/api/addfriend',{userId: currentUser.user_id, friendId: state.userId})
+            .then(res=>{
+                Axios.post('/api/checkrelationship',{userId: currentUser.user_id, friendId: state.userId})
+                .then(res=>{
+                    switch(res.data) {
+                        case 'friend':
+                            setRelationship('Unfriend')
+                            break
+                        
+                        case 'requested':
+                            setRelationship('Cancel')
+                            break
+
+                        case 'pending':
+                            setRelationship('Accept')
+                            break
+
+                        case 'none':
+                            setRelationship('Add friend')
+                            break
+                    }
+                })
+            })
+        }
+    }
+
   return (
     <AboutPage>
     <LeftSide>
         <UserInfo>
             <img src={user ? (user.photoURL ? user.photoURL : '/images/user.png') : '/images/user.png'} alt=''/>
             <h3>{user? user.displayName: 'user'}</h3>
-            <span>{user? user.email: 'useremail'}</span>    
+            <span>{user? user.email: 'useremail'}</span>   
+            <div className='profile-btns'>
+                {user && currentUser.user_id !== user.user_id && <button onClick={()=>setChatting(user.user_id)}>Message</button>}
+                {user && currentUser.user_id !== user.user_id && <button onClick={()=>handleAddFriend()}>{relationShip}</button>}
+            </div> 
         </UserInfo>
         <Tabs>
             <div className='buttons'>
-                <a className={active == 'editDetails' ? 'active': ''} onClick={()=>{setActive('editDetails')}}>Edit details</a>
-                <a className={active == 'posts' ? 'active': ''} onClick={()=>{setActive('posts')}}>Your posts</a>
-                {user ? (user.type !== 'admin' && <a className={active == 'shop' ? 'active': ''} onClick={()=>{setActive('shop')}}>Your shop</a>):""}
+                <a className={active == 'posts' ? 'active': ''} onClick={()=>{setActive('posts')}}>Posts</a>
+                {user ? (user.type !== 'admin' && <a className={active == 'shop' ? 'active': ''} onClick={()=>{setActive('shop')}}>Shop</a>):""}
                 {user ? (user.type === 'admin' && <a className={active == 'adminShop' ? 'active': ''} onClick={()=>{setActive('adminshop')}}>Shop</a>):""}
-                {user ? (user.type === 'admin' && <a className={active == 'advertisement' ? 'active': ''} onClick={()=>{setActive('advertisement')}}>Advertisement</a>):""}
-                <a className={active == 'request' || active == 'adminrequest' ? 'active': ''} onClick={()=>{
-                    if(user.type === 'admin') {
-                        setActive('adminrequest')
-                    } else {
-                        setActive('request')
-                    }
-                }}>Order requests</a>
-                {user ? (user.type !== 'admin' && <a className={active == 'cart' ? 'active': ''} onClick={()=>{setActive('cart')}}>Your cart</a>):""}
-                {user ? (user.type !== 'admin' && <a className={active == 'history' ? 'active': ''} onClick={()=>{setActive('history')}}>Shopping history</a>):""}
+                {
+                    user && currentUser.user_id === user.user_id &&
+                    <>
+                        <a className={active == 'editDetails' ? 'active': ''} onClick={()=>{setActive('editDetails')}}>Edit details</a>
+                        {user ? (user.type === 'admin' && <a className={active == 'advertisement' ? 'active': ''} onClick={()=>{setActive('advertisement')}}>Advertisement</a>):""}
+                        <a className={active == 'request' || active == 'adminrequest' ? 'active': ''} onClick={()=>{
+                            if(user.type === 'admin') {
+                                setActive('adminrequest')
+                            } else {
+                                setActive('request')
+                            }
+                        }}>Order requests</a>
+                        {user ? (user.type !== 'admin' && <a className={active == 'cart' ? 'active': ''} onClick={()=>{setActive('cart')}}>Your cart</a>):""}
+                        {user ? (user.type !== 'admin' && <a className={active == 'history' ? 'active': ''} onClick={()=>{setActive('history')}}>Shopping history</a>):""}
+                    </>
+                }
             </div>
-            <a className='logout' onClick={()=>{setLogOutConfirm(true)}}>Log out</a>
+            {user && currentUser.user_id === user.user_id && <a className='logout' onClick={()=>{setLogOutConfirm(true)}}>Log out</a>}
         </Tabs>
+      {
+        chatting &&
+        <div className='chat-box-container'>
+          <ChatBox
+            userId = {currentUser && currentUser.user_id}
+            name = {currentUser && currentUser.displayName}
+            chatting = {chatting}
+            setChatting = {setChatting}
+          />
+        </div>
+      }
     </LeftSide>
     {
         logOutConfirm && 
@@ -104,6 +193,9 @@ function About() {
         />
     }
     {
+        user && 
+        <>
+        {
         active === 'posts'?(
             <>{caseByActive()}</>
         )
@@ -111,6 +203,8 @@ function About() {
             <RightSide>
                 {caseByActive()}
             </RightSide>)
+        }
+        </>
     }
     </AboutPage>
   )
@@ -189,6 +283,15 @@ height: calc(100vh - 120px);
 background-color: rgb(10,10,10);
 border-radius: 10px;
 box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
+.chat-box-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  height: fit-content;
+  width: fit-content;
+  z-index: 100;
+  background-color: transparent;
+}
 @media (max-width: 1200px) {
   position: relative;
   width: calc(100%);
@@ -224,6 +327,26 @@ img {
 h3 {
     padding: 5px 0;
     margin: 0;
+}
+.profile-btns {
+    padding: 30px 0;
+    button {
+        margin: 10px 5px;
+        padding: 5px 8px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 15px;
+        transition: 0.2s ease-in-out;
+        border: 1px solid white;
+        background-color: rgba(255,255,255,0.3);
+        color: white;
+        user-select: none;
+        &:hover {
+            background-color: white;
+            color: black;
+            cursor: pointer;
+        }
+    }
 }
 `
 

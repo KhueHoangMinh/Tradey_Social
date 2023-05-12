@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import Axios from 'axios'
+import PopUp from '../PopUp'
 
 function Item(props) {
     return (
@@ -63,9 +64,11 @@ function Item(props) {
 
 function Advertisement() {
   const [name, setName] = useState()
+  const [description, setDescription] = useState()
   const [image, setImage] = useState()
   const [link, setLink] = useState()
   const [advertisement,setAdvertisement] = useState([])
+  const [addPopUp,setAddPopUp] = useState(false)
   const user = useSelector(state=>state.auth.user)
   const date = new Date()
 
@@ -75,6 +78,7 @@ function Advertisement() {
     const data = new FormData()
     data.append('userId', user.user_id)
     data.append('name', name)
+    data.append('description', description)
     data.append('image', image)
     data.append('link', link)
 
@@ -97,39 +101,56 @@ function Advertisement() {
   },[])
   return (
     <div>
-      <AddPage>
-        <h2>Add new Advertisement</h2>
-        <div className='new-product-info'>
-          <div className='product-info'>
-            <label>Name:</label>
-            <input type='text' onChange={(e)=>{setName(e.target.value)}}/>
-          </div>
-          <div className='product-info'>
-            <label>Link:</label>
-            <input type='text' onChange={(e)=>{setLink(e.target.value)}}/>
-          </div>
-          <div className='product-info'>
-            <label>Image:</label>
-            <input type='file' onChange={(e)=>{setImage(e.target.files[0])}}/>
-          </div>
-        </div>
-        <button className='add-btn' onClick={e=>handleAdd(e)}>Add</button>
-      </AddPage>
       <ProductsPage>
-        <h2>Advertisements</h2>
+        <div className='header'>
+          <h2>Advertisements</h2>
+          <button className='add-btn' onClick={()=>setAddPopUp(true)}>Add</button>
+        </div>
         <div className='product-list'>
           {
             advertisement.map((product)=>(
               <Item
-                productId = {product ? product.market_id:''}
-                productName = {product ? product.name:''}
-                productImage = {product ? product.image:''}
-                productLink = {product ? product.link:''}
+                type = {1}
+                productId = {advertisement ? advertisement.ad_id:''}
+                productName = {advertisement ? advertisement.name:''}
+                productDesc = {advertisement ? advertisement.description:''}
+                productImage = {advertisement ? advertisement.image:''}
+                productLink = {advertisement ? advertisement.link:''}
               />
             ))
           }
         </div>
       </ProductsPage>
+      {
+        addPopUp &&
+        <PopUp
+          close={()=>{setAddPopUp(false)}}
+          content={
+            <AddPage>
+              <h2>Add new Advertisement</h2>
+              <div className='new-product-info'>
+                <div className='product-info'>
+                  <label>Name:</label>
+                  <input type='text' onChange={(e)=>{setName(e.target.value)}}/>
+                </div>
+                <div className='product-info'>
+                  <label>Description:</label>
+                  <textarea type='text' onChange={(e)=>{setDescription(e.target.value)}}></textarea>
+                </div>
+                <div className='product-info'>
+                  <label>Link:</label>
+                  <input type='text' onChange={(e)=>{setLink(e.target.value)}}/>
+                </div>
+                <div className='product-info'>
+                  <label>Image:</label>
+                  <input type='file' onChange={(e)=>{setImage(e.target.files[0])}}/>
+                </div>
+              </div>
+              <button className='add-btn' onClick={e=>handleAdd(e)}>Add</button>
+            </AddPage>
+          }
+        />
+      }
     </div>
   )
 }
@@ -182,7 +203,33 @@ transition: 0.2s ease-in-out;
 const ProductsPage = styled.div`
 display: flex;
 flex-direction: column;
-h2 {
+position: relative;
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+  background-color: rgb(10,10,10);
+  .add-btn {
+    width: fit-content;
+    margin: 10px 0;
+    padding: 5px 20px;
+    font-weight: 600;
+    font-size: 20px;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    background-color: transparent;
+    transition: 0.2s ease-in-out;
+    &:hover {
+      cursor: pointer;
+      background-color: white; 
+      color: black;
+    }
+  }
 }
 `
 

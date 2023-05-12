@@ -1,3 +1,15 @@
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * const {onCall} = require("firebase-functions/v2/https");
+ * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
+
+// const {onRequest} = require("firebase-functions/v2/https");
+const logger = require("firebase-functions/logger");
+
 const express = require('express')
 const cors = require('cors')
 const http = require('http')
@@ -6,6 +18,7 @@ const multer = require('multer')
 const path = require('path')
 const {Client} = require("cassandra-driver")
 const {Server} = require('socket.io')
+const { onRequest } = require('firebase-functions/v1/https')
 
 
 // const app = express()
@@ -23,6 +36,10 @@ const {Server} = require('socket.io')
 // })
 
 async function run() {
+    // exports.helloWorld = onRequest((request, response) => {
+    //   logger.info("Hello logs!", {structuredData: true});
+    //   response.send("Hello from Firebase!");
+    // });
     const app = express()
     app.use(bodyParser.urlencoded({extended: true}))
     app.use(bodyParser.json({limit: '1mb'}))
@@ -98,6 +115,11 @@ async function run() {
     })
 
     server.listen(3002)
+    // exports.server = onRequest(server)
+
+    app.get('/api/test', (req,res) => {
+        res.send(':D')
+    })
 
 
     app.post('/api/register', async (req,res) => {
@@ -542,11 +564,12 @@ async function run() {
 
     app.post('/api/postadvertisement', advertisementUpload.single('image'), async (req,res) => {
         const name = req.body.name
+        const description = req.body.description
         const image = advertisementFilePath + filename
         const link = req.body.link
-        const query = 'INSERT INTO tradey_ks.advertisement (ad_id,name,image,link) VALUES (uuid(),?,?,?);'
+        const query = 'INSERT INTO tradey_ks.advertisement (ad_id,name,description,image,link) VALUES (uuid(),?,?,?,?);'
 
-        const rs = await client.execute(query, [name,image,link])
+        const rs = await client.execute(query, [name,description,image,link])
 
         res.send(rs.rows)
     })
@@ -915,6 +938,21 @@ async function run() {
         res.send(rs.rows)
     })
 
+    app.post('/api/searchuser', async (req,res) => {
+        const name = req.body.name
+        const query = `SELECT user_id,name,email,photourl,type FROM tradey_ks.users_by_user_id;`
+        var rs = await client.execute(query)
+
+        var finalRs = []
+        for(var i = 0; i < rs.rows.length; i++) {
+            if(rs.rows[i].name.toLowerCase().includes(name.toLowerCase())) {
+                finalRs.push(rs.rows[i])
+            }
+        }
+
+        res.send(finalRs)
+    })
+
     app.post('/api/getmessages', async (req,res) => {
         const senderId = req.body.userId
         const receiverId = req.body.chatting
@@ -931,10 +969,117 @@ async function run() {
         res.send(finalRs)
     })
 
+    app.post("/api/addfriend", async (req,res) => {
+        const userId = req.body.userId
+        const friendId = req.body.friendId
+
+        const query1 = `SELECT * FROM tradey_ks.relations_by_user_id WHERE user_id = ? AND friend_id = ?;`
+        const rs1 = await client.execute(query1,[userId,friendId])
+        const rs2 = await client.execute(query1, [friendId,userId])
+
+        if(rs1.rows.length == 1 && rs2.rows.length == 1) {
+            const deleteQuery = `BEGIN BATCH
+            DELETE FROM tradey_ks.relations_by_user_id WHERE user_id = ? AND friend_id = ?;
+            DELETE FROM tradey_ks.relations_by_user_id WHERE user_id = ? AND friend_id = ?;
+            DELETE FROM tradey_ks.relations_by_friend_id WHERE friend_id = ? AND user_id = ?;
+            DELETE FROM tradey_ks.relations_by_friend_id WHERE friend_id = ? AND user_id = ?;
+            APPLY BATCH;`
+            await client.execute(deleteQuery,[userId,friendId,friendId,userId, friendId,userId,userId,friendId])
+            res.send("unfriended")
+        } else if(rs1.rows.length == 1 && rs2.rows.length == 0) {
+            const deleteQuery = `BEGIN BATCH
+            DELETE FROM tradey_ks.relations_by_user_id WHERE user_id = ? AND friend_id = ?;
+            DELETE FROM tradey_ks.relations_by_friend_id WHERE friend_id = ? AND user_id = ?;`
+            await client.execute(deleteQuery,[userId,friendId,friendId,userId])
+            res.send("canceled")
+        } else if (rs1.rows.length == 0 && rs2.rows.length == 1) {
+            const insertQuery = `BEGIN BATCH
+            INSERT INTO tradey_ks.relations_by_user_id (user_id,friend_id) VALUES (?,?);
+            INSERT INTO tradey_ks.relations_by_friend_id (user_id,friend_id) VALUES (?,?);
+            APPLY BATCH;`
+            await client.execute(insertQuery,[userId,friendId,userId,friendId])
+            res.send("accepted")
+        } else if (rs1.rows.length == 0 && rs2.rows.length == 0){
+            const insertQuery = `BEGIN BATCH
+            INSERT INTO tradey_ks.relations_by_user_id (user_id,friend_id) VALUES (?,?);
+            INSERT INTO tradey_ks.relations_by_friend_id (user_id,friend_id) VALUES (?,?);
+            APPLY BATCH;`
+            await client.execute(insertQuery,[userId,friendId,userId,friendId])
+            res.send("requested")
+        } else {
+            res.send("error")
+        }
+    })
+
+    app.post('/api/checkrelationship', async (req,res) => {
+        const userId = req.body.userId
+        const friendId = req.body.friendId
+
+        const query1 = `SELECT * FROM tradey_ks.relations_by_user_id WHERE user_id = ? AND friend_id = ?;`
+        const rs1 = await client.execute(query1,[userId,friendId])
+        const rs2 = await client.execute(query1, [friendId,userId])
+
+        if(rs1.rows.length == 1 && rs2.rows.length == 1) {
+            res.send("friend")
+        } else if(rs1.rows.length == 1 && rs2.rows.length == 0) {
+            res.send("requested")
+        } else if (rs1.rows.length == 0 && rs2.rows.length == 1) {
+            res.send("pending")
+        } else if (rs1.rows.length == 0 && rs2.rows.length == 0){
+            res.send("none")
+        } else {
+            res.send("error")
+        }
+    })
+
+    app.post('/api/getfriends', async (req,res) => {
+        const userId = req.body.userId
+        const query = `SELECT * FROM tradey_ks.relations_by_user_id WHERE user_id = ?;`
+        const rs = await client.execute(query, [userId])
+        var finalRs = []
+        const checkRekQuery = `SELECT * FROM tradey_ks.relations_by_user_id WHERE user_id = ? AND friend_id = ?;`
+        const getUserInfo = `SELECT type,user_id,name,email,photourl FROM tradey_ks.users_by_user_id WHERE user_id = ?;`
+
+        for(var i = 0; i < rs.rows.length; i++) {
+            var checkRel = await client.execute(checkRekQuery,[rs.rows[i].friend_id,userId])
+            if(checkRel.rows.length == 1) {
+                var userRs = await client.execute(getUserInfo, [checkRel.rows[0].user_id])
+                finalRs.push(userRs.rows[0])
+            }
+        }
+        res.send(finalRs)
+    })
+
+
+// apis for Cyberpunk7702
+app.post("/insertgamedata", async function dosth(req,res) { 
+    let username = req.body.playername 
+    let bestscore = req.body.bestscore 
+    const result = await client.execute(`INSERT INTO tradey_ks.best_scores(username, user_id, bestscore) VALUES (?, uuid(), ${bestscore.toString()});`,[username]) 
+    res.send(result) })
+
+
+    app.post ("/getgamedata", async function dosth(req,res) { 
+        const query = "SELECT * FROM tradey_ks.best_scores;" 
+        var result = await client.execute(query) 
+        result.rows.sort((a, b) => (a.bestscore > b.bestscore) ? -1 : 1) 
+        res.send(result.rows) })
 
     app.listen(3001)
+
+    
+    // exports.app = onRequest(app)
 }
 
 run();
 
 
+
+
+// Create and deploy your first functions
+// https://firebase.google.com/docs/functions/get-started
+
+// exports.helloWorld = onRequest((request, response) => {
+//   logger.info("Hello logs!", {structuredData: true});
+//   response.send("Hello from Firebase!");
+// });

@@ -16,7 +16,7 @@ height: calc(100vh - 180px);
 }
 `
 
-export const SearchPanel = styled.div`
+export const SearchPanel = styled.form`
 box-shadow: 5px 5px 20px rgba(0,0,0,0.6);
 display: flex;
 flex-direction: row;

@@ -1,15 +1,20 @@
 {
-  "name": "tradey-backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ."
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "node .",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
   },
-  "author": "",
-  "license": "ISC",
+  "engines": {
+    "node": "18"
+  },
+  "main": "index.js",
   "dependencies": {
+    "firebase-admin": "^11.8.0",
+    "firebase-functions": "^4.3.1",
     "@stargate-oss/stargate-grpc-node-client": "^0.2.3",
     "body-parser": "^1.20.1",
     "cassandra-driver": "^4.6.4",
@@ -20,5 +25,9 @@
     "mysql": "^2.18.1",
     "path": "^0.12.7",
     "socket.io": "^4.6.1"
-  }
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
 }

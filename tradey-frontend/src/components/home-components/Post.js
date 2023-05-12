@@ -129,7 +129,7 @@ function Post(props) {
   return (
     <div>
         {
-            loading === 1 ? (
+            loading === 1 && (
                 <Panel className='user-post'>
                     <div className='userinfo'>
                       <img className='user-image' crossOrigin='anonymous' src={props.contentType !== 'shared' ? (postContent && (postContent.photourl ? window.host + postContent.photourl : '/images/user.png')) : (props.photoURL ? (window.host + props.photoURL) : '/images/user.png')} alt=''/>
@@ -239,7 +239,7 @@ function Post(props) {
                         </>
                     }
                 </Panel>
-            ) : <Loading></Loading>
+            )
         }
     </div>
   )

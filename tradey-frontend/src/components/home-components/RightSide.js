@@ -19,13 +19,18 @@ function RightSide() {
       setAdvertisement(res.data)
       setLoading(1)
     })
-
-    Axios.post('/api/getusers')
-    .then(res=>{
-      setUsers(res.data)
-      setLoading1(1)
-    })
   },[])
+
+  useEffect(()=>{
+    if(user) {
+      Axios.post('/api/getfriends', {userId: user.user_id})
+      .then(res=>{
+        setUsers(res.data)
+        console.log(res.data)
+        setLoading1(1)
+      })
+    }
+  },[user])
 
   useEffect(()=>{
     if(advertisement.length > 0) {
@@ -111,18 +116,20 @@ function RightSide() {
 
   return (
     <RightSideStyle>
+      <h2>Sponsors</h2>
       <Panel>
           {
             loading === 1 ? (
               <>
                 <a id='advertisement' href={advertisement.length > 0 && advertisement[showingAd].link}>
-                  <img src={advertisement.length > 0 && advertisement[showingAd].image} alt=''/>
+                  <img src={advertisement.length > 0 && window.host + advertisement[showingAd].image} alt=''/>
+                  {/* <img className='ad-bg' src={advertisement.length > 0 && window.host + advertisement[showingAd].image} alt=''/> */}
                   <div className='ad-content'>
                     <h2>
-                      Ad name
+                      {advertisement.length > 0 && advertisement[showingAd].name}
                     </h2>
                     <p>
-                      alskdj askdj alskdja lksdsd fs df sdf dssdsds   ddd sdfja sdlasjdalksdja lsjdla dalskd sdfsdf sdfsdf dfd fdfd sdf d fsdfsdsd s skdjhfksdjhf sdf fhdjfhs kdjfhjd hf sjdfhjd fd fjd fdjhksjdfhs kdjfskjf 
+                      {advertisement.length > 0 && advertisement[showingAd].description}
                     </p>
                   </div>
                 </a>
@@ -130,6 +137,7 @@ function RightSide() {
             ) : <Loading></Loading>
           }
       </Panel>
+      <h2>Friends</h2>
       {
         loading1 == 1 ? (users.map(userInfo => (
           <User className='user-item' onClick={()=>{setChatting(userInfo.user_id)}}>
@@ -158,7 +166,7 @@ function RightSide() {
   )
 }
 
-const User =styled.div`
+export const User =styled.div`
 background-color: rgb(10,10,10);
 border-radius: 10px;
 box-shadow: 5px 5px 5px rgba(0,0,0,0.4);
@@ -251,6 +259,14 @@ margin-bottom: 20px;
     border-radius: 10px;
     object-fit: contain;
     background-color: rgb(100,100,100);
+  }
+  .ad-bg {
+    position: absolute;
+    height: 200%;
+    width: 200%;
+    top: -50%;
+    left: -50%;
+    object-fit: cover;
   }
   .ad-content {
     padding: 5px;

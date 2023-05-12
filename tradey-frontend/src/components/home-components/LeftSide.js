@@ -4,6 +4,9 @@ import styled from 'styled-components'
 import Axios  from 'axios'
 import Button from '../Button'
 import { useNavigate } from 'react-router-dom'
+import { SearchPanel } from '../market-component/Leftside'
+import { User } from './RightSide'
+import Loading from '../Loading'
 
 function HighlightedItem(props) {
   const navigate = useNavigate()
@@ -33,12 +36,17 @@ function LeftSide(props) {
   const [video,setVideo] = useState(null)
   const [highlighted,setHighlighted] = useState()
   const [highlightedList,setHighlightedList] = useState([])
+  const [hightlightedLoading, setHightlightedLoading] = useState(0)
+  const [searchInput,setSearchInput] = useState()
+  const [searchResult,setSearchResult] = useState(null)
+  const [searchLoading, setSearchLoading] = useState(1)
+  const [postLoading, setPostLoading] = useState(1)
+  const navigate = useNavigate()
   const date = new Date()
 
   useEffect(()=>{
     Axios.post('/api/gethighlighted')
     .then(res=>{
-      console.log(res.data)
       setHighlighted(res.data[0])
       setHighlightedList(res.data.slice(1,res.data.length-1))
     })
@@ -46,6 +54,7 @@ function LeftSide(props) {
 
   const postArticle = (e)=>{
     e.preventDefault()
+    setPostLoading(0)
     Axios.post('/api/post', {
       publisherId: user.user_id,
       description: postText,
@@ -57,11 +66,44 @@ function LeftSide(props) {
         "Content-Type": "multipart/form-data"
       }
     })
-    .then(res=>{})
+    .then(res=>{
+      setPostText(null)
+      setImage(null)
+      setVideo(null)
+      setPostLoading(1)
+    })
   }
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    console.log("seraching")
+    setSearchLoading(0)
+    Axios.post('/api/searchuser', {name: searchInput})
+    .then(res=> {
+      setSearchResult(res.data)
+      setSearchLoading(1)
+    })
+
+  }
+
+  const viewUserPage = (userId) => {
+    navigate('/about',{state: {
+      userId: userId
+    }})
+  }
+
   return (
     <LeftSideStyle>
       <Panel onSubmit={e=>postArticle(e)}>
+          <div className="loading-box">
+              {
+                  !postLoading ? (
+                      <Loading
+                          width = {8}
+                      />
+                  ) :''
+              }
+          </div>
           <div className='userinfo'>
             <img src={user ? (user.photoURL ? (window.host + user.photoURL):'/images/user.png') : '/images/user.png'} alt=''/>
             <div>
@@ -95,6 +137,33 @@ function LeftSide(props) {
             >Post</button>
           </div>
       </Panel>
+      <SearchPanel onSubmit={e=>handleSearch(e)}>
+          <input type='text' value={searchInput} placeholder='Search for users...' onChange={e=>setSearchInput(e.target.value)}/>
+          <button type='submit'><img src='/images/search.svg' alt=''/></button>
+      </SearchPanel>
+      {
+        searchResult &&
+        <div className='result-header'>
+          <h2>Found {searchResult.length} result{searchResult.length > 1 && 's'}</h2>
+          <button className="close-btn" onClick={()=>setSearchResult(null)}>
+              <img src='/images/close.svg' alt=''/>
+          </button>
+        </div>
+      }
+      {
+        searchLoading === 1 ? (searchResult && searchResult.map(userInfo => (
+          <User className='user-item' onClick={()=>{viewUserPage(userInfo.user_id)}}>
+            <div className='user-bg'>
+              <img className='user-image' crossOrigin='anonymous' src={userInfo.photourl ? window.host + userInfo.photourl : '/images/user.png'} alt=''/>
+              <div>
+                <h3>{userInfo.name}</h3>
+                <span>{userInfo.email}</span>
+              </div>
+            </div>
+          </User>
+        ))): <Loading></Loading>
+      }
+      <h2>Highlighted Products</h2>
       <Highlighted>
           {
             highlighted && 
@@ -214,6 +283,35 @@ padding: 0 10px;
 ::-webkit-scrollbar {
   display: none;
 }
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  h2 {
+    padding: 0;
+    margin: 0;
+  }
+  .close-btn {
+      padding: 10px;
+      border-radius: 50%;
+      height: 40px;
+      width: 40px;
+      background-color: transparent;
+      transition: 0.2s ease-in-out;
+      position: relative;
+      border: none;
+      img {
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+      }
+      &:hover {
+          background-color: rgba(255,255,255,0.2);
+          cursor: pointer;
+      }
+  }
+}
 @media (max-width: 1200px) {
   padding: 0;
   overflow: unset;
@@ -232,6 +330,10 @@ position: relative;
 width: calc(100% - 60px);
 height: fit-content;
 margin-bottom: 20px;
+.loading-box {
+    position: absolute;
+    right: 20px;
+}
 .userinfo {
   display: flex;
   flex-direction: row;
