@@ -30,7 +30,7 @@ function Post(props) {
             .then(res=>{
                 setPostContent(res.data)
                 if(res.data.type === 'shareproduct') {
-                    Axios.post('/api/getproductbyid', {productId: res.data.content[0].source})
+                    Axios.post('/api/getproductbyid', {productId: res.data.content[0].source, addPublisher: true})
                     .then(res2=>{
                         setProduct(res2.data[0])
                     })
@@ -39,9 +39,11 @@ function Post(props) {
             })
         }
         if(props.type === 'shareproduct') {
-            Axios.post('/api/getproductbyid', {productId: props.content[0].source})
+            setLoading(0)
+            Axios.post('/api/getproductbyid', {productId: props.content[0].source, addPublisher: true})
             .then(res2=>{
                 setProduct(res2.data[0])
+                setLoading(1)
             })
         }
     },[])
@@ -142,10 +144,10 @@ function Post(props) {
     },[change])
 
   return (
-    <>
+    <Panel className='user-post'>
         {
-            loading === 1 && (
-                <Panel className='user-post'>
+            loading === 1 ? (
+                <>
                     <div className='userinfo'>
                       <img className='user-image' crossOrigin='use-credentials' src={props.contentType !== 'shared' ? (postContent && (postContent.photourl ? window.host + postContent.photourl : '/images/user.png')) : (props.photoURL ? (window.host + props.photoURL) : '/images/user.png')} alt=''/>
                       <div>
@@ -271,10 +273,10 @@ function Post(props) {
                             </div>
                         </>
                     }
-                </Panel>
-            )
+                </>
+            ) : <Loading></Loading>
         }
-    </>
+    </Panel>
   )
 }
 

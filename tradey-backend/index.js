@@ -868,8 +868,14 @@ async function run() {
         const query = `SELECT * FROM tradey_ks.products_by_product_id WHERE product_id = ?;`
 
         const rs = await client.execute(query,[productId])
+        var additional = {}
+        if(req.body.addPublisher) {
+            const userQuery = `SELECT user_id,name,email,photourl,type FROM tradey_ks.users_by_user_id WHERE user_id = ?;`
+            const userRs = await client.execute(userQuery,[rs.rows[0].seller_id])
+            additional = userRs.rows[0]
+        }
 
-        res.send(rs.rows)
+        res.send([{...rs.rows[0],...additional}])
     })
 
     var userfilename = ''
