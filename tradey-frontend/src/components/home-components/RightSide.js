@@ -26,7 +26,6 @@ function RightSide() {
       Axios.post('/api/getfriends', {userId: user.user_id})
       .then(res=>{
         setUsers(res.data)
-        console.log(res.data)
         setLoading1(1)
       })
     }

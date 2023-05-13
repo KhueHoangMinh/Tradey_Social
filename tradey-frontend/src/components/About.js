@@ -259,6 +259,7 @@ color: rgb(230,230,230);
     position: relative;
     height: 100%;
     padding: 0 25%;
+    min-width: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -271,6 +272,11 @@ color: rgb(230,230,230);
   display: flex;
   flex-direction: column;
   padding: 20px 5%;
+  height: fit-content;
+  .posts {
+    padding: 20px 0;
+    min-width: unset;
+  }
 }
 `
 
@@ -308,6 +314,11 @@ overflow-y: scroll;
 overflow-x: hidden;
 ::-webkit-scrollbar {
   display: none;
+}
+@media (max-width: 1200px) {
+  position: relative;
+  width: calc(100%);
+  overflow-y: visible;
 }
 `
 

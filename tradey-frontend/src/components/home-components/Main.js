@@ -12,7 +12,6 @@ function Main(props) {
   const [showingShareInput, setShowingShareInput] = useState()
   const user = useSelector(state=>state.auth.user)
   useEffect(()=>{
-    console.log('getting posts')
     Axios.get('/api/getposts')
     .then(res=>{
       setPosts(res.data)

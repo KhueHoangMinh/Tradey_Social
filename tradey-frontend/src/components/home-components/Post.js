@@ -7,6 +7,7 @@ import ShareBox from './post-component/ShareBox'
 import { CommentButton, ReactButton, ShareButton } from './SocialButton'
 import CommentInput from './CommentInput'
 import Loading from '../Loading.js'
+import Item from '../market-component/Item'
 
 function Post(props) {
     const navigate = useNavigate()
@@ -19,6 +20,7 @@ function Post(props) {
     const [liked,setLiked] = useState(null)
     const [mostReact,setMostReact] = useState([])
     const [postContent,setPostContent] = useState([])
+    const [product,setProduct] = useState()
     const [loading,setLoading] = useState(1)
 
     useEffect(()=>{
@@ -27,7 +29,19 @@ function Post(props) {
             Axios.post('/api/getpostbypostid', {postId: props.id})
             .then(res=>{
                 setPostContent(res.data)
+                if(res.data.type === 'shareproduct') {
+                    Axios.post('/api/getproductbyid', {productId: res.data.content[0].source})
+                    .then(res2=>{
+                        setProduct(res2.data[0])
+                    })
+                }
                 setLoading(1)
+            })
+        }
+        if(props.type === 'shareproduct') {
+            Axios.post('/api/getproductbyid', {productId: props.content[0].source})
+            .then(res2=>{
+                setProduct(res2.data[0])
             })
         }
     },[])
@@ -65,7 +79,6 @@ function Post(props) {
         } else {
             props.setShowingShareInput(props.id)
         }
-        console.log(props.id,' ',props.showingShareInput)
     }
 
     useEffect(()=>{
@@ -122,12 +135,14 @@ function Post(props) {
     
     
             Axios.post('/api/getshares',{id: props.id})
-            .then(res=>setShares(res.data.shares))
+            .then(res=>{
+                setShares(res.data.shares)
+            })
         }
     },[change])
 
   return (
-    <div>
+    <>
         {
             loading === 1 && (
                 <Panel className='user-post'>
@@ -145,7 +160,7 @@ function Post(props) {
         
                     
                     {
-                        (postContent && postContent.type) === 'share' || props.type === 'share' ? (
+                        (postContent && postContent.type === 'share') || props.type === 'share' ? (
                             <div className='content'>
                                 {
                                     props.contentType !== 'shared' ? (postContent &&  postContent.sharedContent && <Post
@@ -179,18 +194,35 @@ function Post(props) {
                                     />)
                                 }
                             </div>
-                        ) : (
-                        <div className='content'>
-                            {   
-                                props.contentType !== 'shared' ?
-                                (postContent && (postContent.content && postContent.content.map((content) => (
-                                    <img className='posted-image' src={window.host + content.link} alt=''/>
-                                )))) : 
-                                (props.content.map((content) => (
-                                    <img className='posted-image' src={window.host + content.link} alt=''/>
-                                ))) 
-                            }
-                        </div>
+                        ) : ((postContent && postContent.type === 'shareproduct') || props.type === 'shareproduct' ?
+                            (product &&
+                                <Item
+                                    userId = {props.userId}
+                                    sellerId = {product.user_id}
+                                    userPhotoURL = {product.photourl}
+                                    userDisplayName = {product.name}
+                                    userEmail = {product.email}
+                                    productTime = {product.time}
+                                    productId={product.product_id}
+                                    name={product.product_name}
+                                    description={product.description}
+                                    image={product.image}
+                                    price={product.price}
+                                    type={product.type}
+                                />
+                            ) : (
+                                <div className='content'>
+                                    {   
+                                        props.contentType !== 'shared' ?
+                                        (postContent && (postContent.content && postContent.content.map((content) => (
+                                            <img className='posted-image' src={window.host + content.link} alt=''/>
+                                        )))) : 
+                                        (props.content.map((content) => (
+                                            <img className='posted-image' src={window.host + content.link} alt=''/>
+                                        ))) 
+                                    }
+                                </div>
+                            )
                         )
                     }
                     {
@@ -223,6 +255,7 @@ function Post(props) {
                                             userId = {props.userId}
                                             showingCommentInput = {props.showingShareInput}
                                             setShowingCommentInput = {props.setShowingShareInput} 
+                                            type = 'share'
                                         />
                                 }
                                 {showComments && 
@@ -241,7 +274,7 @@ function Post(props) {
                 </Panel>
             )
         }
-    </div>
+    </>
   )
 }
 
@@ -251,6 +284,7 @@ border-radius: 10px;
 box-shadow: 5px 5px 5px rgba(0,0,0,0.4);
 padding: 30px;
 margin-bottom: 20px;
+width: calc(100% - 60px);
 .userinfo {
     display: flex;
     flex-direction: row;
@@ -286,10 +320,12 @@ padding: 20px;
 margin-left:-20px;
 border-radius: 10px;
 overflow:hidden;
+position: relative;
 .posted-image {
     width: 100%;
     height: 500px;
     object-fit: cover;
+    border-radius: 10px;
 }
 }
 .social {

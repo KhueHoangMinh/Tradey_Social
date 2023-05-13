@@ -92,6 +92,11 @@ function SingleRequest(props) {
                     </div>
                 </div>
                 <div className='order-info'>
+                  
+                  <div className='indiv-order-info'>
+                      <h3>Bill ID: </h3>
+                      <h3>{props.order.bill_id}</h3>
+                  </div>
                   <div className='indiv-order-info'>
                     <strong>Phone: </strong>
                     <span>{props.order.phone}</span>
@@ -133,7 +138,6 @@ function Request(props) {
   useEffect(()=>{
       Axios.post('/api/getrequests',{userId: props.user.user_id})
       .then(res=>{
-        console.log(res.data)
           setOrders(res.data)
           setLoading(1)
       })

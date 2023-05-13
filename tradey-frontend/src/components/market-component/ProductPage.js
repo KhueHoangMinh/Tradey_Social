@@ -6,6 +6,10 @@ import { useSelector } from 'react-redux'
 import Loading from '../Loading'
 import Item from './Item'
 import Button from '../Button.js'
+import { ReactButton,CommentButton, ShareButton } from '../home-components/SocialButton'
+import ShareBox from '../home-components/post-component/ShareBox'
+import Comments from '../home-components/post-component/Comments'
+import PopUp from '../PopUp'
 
 function ProductPage(props) {
   const {state} = useLocation()
@@ -16,6 +20,16 @@ function ProductPage(props) {
   const [loading1,setLoading1] = useState(0)
   const [seller, setSeller] = useState()
   const [quantity,setQuantity] = useState(1)
+  const [likes, setLikes] = useState([])
+  const [comments, setComments] = useState([])
+  const [shares, setShares] = useState(0)
+  const [showComments,setShowComments] = useState(false)
+  const [change,setChange] = useState(false)
+  const [cmtChange,setCmtChange] = useState(false)
+  const [liked,setLiked] = useState(null)
+  const [mostReact,setMostReact] = useState([])
+  const [showingCommentInput, setShowingCommentInput] = useState()
+  const [showingShareInput, setShowingShareInput] = useState()
 
   useEffect(()=>{
     Axios.post('/api/getproductbyid', {productId: state.productId})
@@ -36,11 +50,97 @@ function ProductPage(props) {
 
   const handleAdd = () => {
     if(quantity > 0) {
-      Axios.post('/api/addtocart', {userId: user.user_id, productId: product.product_id, quantity: quantity, action: 'add'})
+      Axios.post('/api/addtocart', {userId: user.user_id, productId: state.productId, quantity: quantity, action: 'add'})
       .then(res => {
       })
     }
   }
+
+  const handleLike = (type) => {
+    Axios.post('/api/like',{postId: state.productId, userId: user.user_id, type: type})
+    .then(()=>{
+        setChange(!change)
+    })
+}
+
+const handleComment = () => {
+    if(!showComments) {
+        setShowingCommentInput(state.productId)
+        setShowingShareInput(null)
+        setShowComments(!showComments)
+    } else {
+        if(showingCommentInput === state.productId) {
+            setShowComments(!showComments)
+        } else {
+            setShowingCommentInput(state.productId)
+            setShowingShareInput(null)
+        }
+    }
+}
+
+const handleShare = () => {
+    setShowComments(false)
+    if(showingShareInput === state.productId) {
+        setShowingShareInput(null)
+    } else {
+        setShowingShareInput(state.productId)
+    }
+}
+
+useEffect(()=>{
+    Axios.post('/api/getcomments',{id: state.productId})
+    .then(res=>{
+        setComments(res.data)
+    })
+},[cmtChange])
+
+useEffect(()=>{
+      Axios.post('/api/getlikes',{id: state.productId})
+      .then(res=>{
+          setLikes(res.data)
+          setLiked(null)
+          var reacts = [
+              {react: 'like',quant: 0},
+              {react: 'love',quant: 0},
+              {react: 'haha',quant: 0},
+              {react: 'wow',quant: 0},
+              {react: 'sad',quant: 0},
+              {react: 'angry',quant: 0}
+          ]
+          for(var i = 0; i < res.data.length; i++) {
+              if(res.data[i].liker_id === user.user_id) {
+                  setLiked(res.data[i])
+              }
+              switch(res.data[i].type) {
+                  case 'like':
+                      reacts[0].quant++
+                      break
+                  case 'love':
+                      reacts[1].quant++
+                      break
+                  case 'haha':
+                      reacts[2].quant++
+                      break
+                  case 'wow':
+                      reacts[3].quant++
+                      break
+                  case 'sad':
+                      reacts[4].quant++
+                      break
+                  case 'angry':
+                      reacts[5].quant++
+                      break
+              }
+          }
+          reacts.sort((a, b) => (a.quant > b.quant) ? -1: 1)
+          setMostReact(reacts.slice(0,3))
+      })
+
+
+      Axios.post('/api/getshares',{id: state.productId})
+      .then(res=>setShares(res.data.shares))
+},[change])
+
   return (
     <div>
           <Container>
@@ -80,6 +180,57 @@ function ProductPage(props) {
               </LeftColumn>
             </div>) : <Loading></Loading>
           }
+          <CommentSection>
+            <div className='reactions'>
+              <h2>How do you feel about this product?</h2>
+              <ReactButton
+                handleLike = {handleLike}
+                liked = {liked}
+                likes = {likes}
+                mostReact = {mostReact}
+              />
+              <CommentButton
+                  handleComment = {handleComment}
+                  comments = {comments}
+                  openning = {showComments}
+                  text = 'Review'
+              />
+              <ShareButton
+                  handleShare = {handleShare}
+                  shares = {shares}
+                  openning = {showingShareInput === state.productId ? true : false}
+              />
+            </div>
+            {
+                showingShareInput === state.productId &&
+                  <PopUp
+                    close = {()=>setShowingShareInput(null)}
+                    content = {
+                      <>
+                        <h2>Share this product</h2>
+                        <ShareBox
+                          postId = {state.productId}
+                          userId = {user.user_id}
+                          showingCommentInput = {showingShareInput}
+                          setShowingCommentInput = {setShowingShareInput} 
+                          closePopUp = {()=>setShowingShareInput(null)}
+                          type = 'shareproduct'
+                        />
+                      </>
+                    }
+                  />
+            }
+            {
+            <Comments
+                postId = {state.productId}
+                userId = {user.user_id}
+                comments = {comments}
+                change = {cmtChange}
+                setChange = {setCmtChange}
+                showingCommentInput = {showingCommentInput}
+                setShowingCommentInput = {setShowingCommentInput} 
+            />}
+          </CommentSection>
           <More>
             <h2>More products from this shop</h2>
             {
@@ -110,6 +261,17 @@ function ProductPage(props) {
   )
 }
 
+const CommentSection = styled.div`
+padding: 30px 15%;
+background-color: rgb(10,10,10);
+width: 70%;
+color: white;
+.reactions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+`
 
 const Container = styled.div`
 position: relative;

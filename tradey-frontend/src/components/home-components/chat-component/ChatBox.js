@@ -18,7 +18,6 @@ function ChatBox(props) {
             for(var i = 0; i< res.data.length; i++) {
                     processMessages.push({senderId: res.data[i].sender_id,receiverId: res.data[i].receiver_id,message: res.data[i].message,time: res.data[i].time})
                 }
-            console.log(processMessages)
             setMessages(processMessages)
         })
 

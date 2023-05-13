@@ -85,6 +85,9 @@ const ReactButtonStyle = styled.div`
 button {
     img {
         padding-right: 1px;
+        height: 15px;
+        width: 15px;
+        object-fit: cover;
     }
     width: fit-content;
     height: fit-content;

@@ -76,7 +76,6 @@ function LeftSide(props) {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    console.log("seraching")
     setSearchLoading(0)
     Axios.post('/api/searchuser', {name: searchInput})
     .then(res=> {

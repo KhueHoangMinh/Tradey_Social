@@ -114,7 +114,6 @@ async function run() {
         })
 
         socket.on("disconnect", ()=> {
-            console.log(`disconnected ${socket.id}`)
         })
     })
 
@@ -204,10 +203,9 @@ async function run() {
         const publisherId = req.body.publisherId
         const description = req.body.description
         const type = req.body.type
-        console.log(type)
         var source = null
         var link = null
-        if(type === 'share') {
+        if(type === 'share' || type === 'shareproduct') {
             source = req.body.source
         } else {
             if(req.file) {
@@ -271,18 +269,19 @@ async function run() {
             const rs = await client.execute(query,[postId])
             var respondRs = null
     
-            var dataQuery = 'SELECT user_id, type AS user_type, name, photourl, email FROM tradey_ks.users_by_user_id WHERE user_id = ?;'
-            var dataRs1 = await client.execute(dataQuery,[rs.rows[0].publisher_id])
-    
-            dataQuery = 'SELECT * FROM tradey_ks.post_contents_by_post_id WHERE post_id = ?;'
-            var dataRs2 = await client.execute(dataQuery,[rs.rows[0].post_id])
-    
-            respondRs = {...rs.rows[0],...dataRs1.rows[0],content: dataRs2.rows}
-    
-            if(dataRs2.rows.length === 1 && dataRs2.rows[0].source) {
-                respondRs = {...respondRs, sharedContent: await getPostByPostId(dataRs2.rows[0].source)}
+            if(rs.rows.length == 1) {
+                var dataQuery = 'SELECT user_id, type AS user_type, name, photourl, email FROM tradey_ks.users_by_user_id WHERE user_id = ?;'
+                var dataRs1 = await client.execute(dataQuery,[rs.rows[0].publisher_id])
+        
+                dataQuery = 'SELECT * FROM tradey_ks.post_contents_by_post_id WHERE post_id = ?;'
+                var dataRs2 = await client.execute(dataQuery,[rs.rows[0].post_id])
+        
+                respondRs = {...rs.rows[0],...dataRs1.rows[0],content: dataRs2.rows}
+        
+                if(dataRs2.rows.length === 1 && dataRs2.rows[0].source) {
+                    respondRs = {...respondRs, sharedContent: await getPostByPostId(dataRs2.rows[0].source)}
+                }
             }
-
             return respondRs
         }
 
@@ -340,7 +339,7 @@ async function run() {
         const rs = await client.execute(query)
 
         for(var i = 0; i < rs.rows.length; i++) {
-            if(rs.rows[i].source === postId) {
+            if(rs.rows[i].source == postId) {
                 shares++
             }
         }
@@ -407,15 +406,6 @@ async function run() {
         await client.execute(query, [idRs.rows[0].id, postId, userId, content, selectRs.rows[0].time])
 
         res.send('commented')
-    })
-
-    app.post('/api/share', async (req,res)=> {
-        const userId = req.body.userId
-        const postId = req.body.postId
-        const query = "INSERT INTO tradey_ks.shares_by_time (share_id,post_id,sharer_id,time) VALUES (uuid(),?,?,toTimeStamp(now()));"
-
-        const rs = await client.execute(query, [postId, userId])
-        res.send(rs.rows)
     })
 
     var marketFilepath = 'storage/product/'
