@@ -54,7 +54,7 @@ function RightSide() {
 
 //     for(var i = 0; i < users.length; i++) {
 //         var image = users[i].getElementsByClassName('user-image')[0]
-//         // image.crossOrigin = 'Anonymous'
+//         // image.crossOrigin = 'use-credentials'
 //         var rgb = getAverageRGB(image);
 //         users[i].style.backgroundColor = 'rgb('+rgb.r+','+rgb.g+','+rgb.b+')';
 //     }
@@ -142,7 +142,7 @@ function RightSide() {
         loading1 == 1 ? (users.map(userInfo => (
           <User className='user-item' onClick={()=>{setChatting(userInfo.user_id)}}>
             <div className='user-bg'>
-              <img className='user-image' crossOrigin='anonymous' src={userInfo.photourl ? window.host + userInfo.photourl : '/images/user.png'} alt=''/>
+              <img className='user-image' crossOrigin='use-credentials' src={userInfo.photourl ? window.host + userInfo.photourl : '/images/user.png'} alt=''/>
               <div>
                 <h3>{userInfo.name}</h3>
                 <span>{userInfo.email}</span>

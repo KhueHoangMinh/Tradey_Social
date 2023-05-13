@@ -44,7 +44,10 @@ async function run() {
     app.use(bodyParser.urlencoded({extended: true}))
     app.use(bodyParser.json({limit: '1mb'}))
     app.use(express.json())
-    app.use(cors({origin: ["http://192.168.1.7:3000","http://localhost:3000/"]}))
+    app.use(cors({
+        origin: ["http://192.168.1.7:3000","http://localhost:3000"],
+        credentials: true
+    }))
 
     app.use('/storage',express.static('storage'))
 
@@ -65,8 +68,9 @@ async function run() {
 
     const io = new Server(server, {
         cors: {
-            origin: "http://192.168.1.7:3000",
-            methods: ["GET","POST"]
+            origin: ["http://192.168.1.7:3000","http://localhost:3000"],
+            methods: ["GET","POST"],
+            credentials: true
         }
     })
 
@@ -989,7 +993,8 @@ async function run() {
         } else if(rs1.rows.length == 1 && rs2.rows.length == 0) {
             const deleteQuery = `BEGIN BATCH
             DELETE FROM tradey_ks.relations_by_user_id WHERE user_id = ? AND friend_id = ?;
-            DELETE FROM tradey_ks.relations_by_friend_id WHERE friend_id = ? AND user_id = ?;`
+            DELETE FROM tradey_ks.relations_by_friend_id WHERE friend_id = ? AND user_id = ?;
+            APPLY BATCH;`
             await client.execute(deleteQuery,[userId,friendId,friendId,userId])
             res.send("canceled")
         } else if (rs1.rows.length == 0 && rs2.rows.length == 1) {

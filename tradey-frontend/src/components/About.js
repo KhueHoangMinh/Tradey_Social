@@ -67,7 +67,7 @@ function About() {
                         break
                 }
             })
-        } else if(!state || state.userId == currentUser.user_id) {
+        } else if(!state || (state.userId == currentUser.user_id)) {
             setUser(currentUser)
         }
     },[user])
@@ -135,7 +135,7 @@ function About() {
     <AboutPage>
     <LeftSide>
         <UserInfo>
-            <img src={user ? (user.photoURL ? user.photoURL : '/images/user.png') : '/images/user.png'} alt=''/>
+            <img src={user ? (user.photoURL ? window.host + user.photoURL : '/images/user.png') : '/images/user.png'} alt=''/>
             <h3>{user? user.displayName: 'user'}</h3>
             <span>{user? user.email: 'useremail'}</span>   
             <div className='profile-btns'>

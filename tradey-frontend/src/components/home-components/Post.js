@@ -132,7 +132,7 @@ function Post(props) {
             loading === 1 && (
                 <Panel className='user-post'>
                     <div className='userinfo'>
-                      <img className='user-image' crossOrigin='anonymous' src={props.contentType !== 'shared' ? (postContent && (postContent.photourl ? window.host + postContent.photourl : '/images/user.png')) : (props.photoURL ? (window.host + props.photoURL) : '/images/user.png')} alt=''/>
+                      <img className='user-image' crossOrigin='use-credentials' src={props.contentType !== 'shared' ? (postContent && (postContent.photourl ? window.host + postContent.photourl : '/images/user.png')) : (props.photoURL ? (window.host + props.photoURL) : '/images/user.png')} alt=''/>
                       <div>
                         <h3 onClick={handleNav}>{props.contentType !== 'shared' ? (postContent && postContent.name) : props.displayName}</h3>
                         <span>{props.contentType !== 'shared' ? (postContent && postContent.email) : props.email}</span>

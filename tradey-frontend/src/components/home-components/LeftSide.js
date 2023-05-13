@@ -154,7 +154,7 @@ function LeftSide(props) {
         searchLoading === 1 ? (searchResult && searchResult.map(userInfo => (
           <User className='user-item' onClick={()=>{viewUserPage(userInfo.user_id)}}>
             <div className='user-bg'>
-              <img className='user-image' crossOrigin='anonymous' src={userInfo.photourl ? window.host + userInfo.photourl : '/images/user.png'} alt=''/>
+              <img className='user-image' crossOrigin='use-credentials' src={userInfo.photourl ? window.host + userInfo.photourl : '/images/user.png'} alt=''/>
               <div>
                 <h3>{userInfo.name}</h3>
                 <span>{userInfo.email}</span>

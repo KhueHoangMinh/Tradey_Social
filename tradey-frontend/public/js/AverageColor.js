@@ -4,7 +4,7 @@ var posts = document.getElementsByClassName('user-post')
 
 for(var i = 0; i < posts.length; i++) {
     var image = posts[i].getElementsByClassName('user-image')[0]
-    // image.crossOrigin = 'Anonymous'
+    // image.crossOrigin = 'use-credentials'
     var rgb = getAverageRGB(image);
     posts[i].style.backgroundColor = 'rgb('+rgb.r+','+rgb.g+','+rgb.b+')';
 }
