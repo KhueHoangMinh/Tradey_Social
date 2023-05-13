@@ -20,7 +20,7 @@ const {Client} = require("cassandra-driver")
 const {Server} = require('socket.io')
 const { onRequest } = require('firebase-functions/v1/https')
 
-
+FRONTEND = "http://192.168.1.7"
 // const app = express()
 // app.use(bodyParser.urlencoded({extended: true}))
 // app.use(bodyParser.json({limit: '1mb'}))
@@ -45,7 +45,7 @@ async function run() {
     app.use(bodyParser.json({limit: '1mb'}))
     app.use(express.json())
     app.use(cors({
-        origin: ["http://192.168.1.7:3000","http://localhost:3000"],
+        origin: [FRONTEND + ":3000","http://localhost:3000"],
         credentials: true
     }))
 
@@ -68,7 +68,7 @@ async function run() {
 
     const io = new Server(server, {
         cors: {
-            origin: ["http://192.168.1.7:3000","http://localhost:3000"],
+            origin: [FRONTEND + ":3000","http://localhost:3000"],
             methods: ["GET","POST"],
             credentials: true
         }
