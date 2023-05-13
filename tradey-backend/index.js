@@ -589,7 +589,7 @@ async function run() {
         const productId = req.body.productId
         const userId = req.body.userId
         const action = req.body.action
-        const quantity = 1
+        const quantity = req.body.quantity
 
         const selectQuery = `SELECT * FROM tradey_ks.cart WHERE user_id = ? AND product_id = ?;`
         const selectRs = await client.execute(selectQuery,[userId,productId])
@@ -645,6 +645,36 @@ async function run() {
         }
 
         res.send(finalRs)
+    })
+
+    app.post("/api/changecartquant", async  (req,res) => {
+        const userId = req.body.userId
+        const productId = req.body.productId
+        const action = req.body.action
+        const query = `SELECT * FROM tradey_ks.cart WHERE user_id = ? AND product_id = ?;`
+        const rs = await client.execute(query, [userId, productId])
+        var quantity = 1
+
+        if(rs.rows.length == 0) {
+            res.send("error")
+        } else {
+            quantity = rs.rows[0].quantity
+            if(action == 'dec') {
+                if(rs.rows[0].quantity > 1) {
+                    const updateQuery = `UPDATE tradey_ks.cart SET quantity = ${(rs.rows[0].quantity - 1).toString()} WHERE user_id = ? AND product_id = ?;`
+                    await client.execute(updateQuery, [userId,productId])
+                } else {
+                    const deleteQuery = `DELETE FROM tradey_ks.cart WHERE user_id = ? AND product_id = ?;`
+                    await client.execute(deleteQuery, [userId,productId])
+                }
+                quantity--
+            } else if (action == "inc") {
+                const updateQuery = `UPDATE tradey_ks.cart SET quantity = ${(rs.rows[0].quantity + 1).toString()} WHERE user_id = ? AND product_id = ?;`
+                await client.execute(updateQuery, [userId,productId])
+                quantity++
+            }
+            res.send({quantity: quantity})
+        }
     })
 
     app.post('/api/checkout', async (req,res) => {
@@ -724,8 +754,6 @@ async function run() {
         const billsQuery = `SELECT * FROM tradey_ks.bills_by_bill_id;`
         const billsRs = await client.execute(billsQuery)
 
-        billsRs.rows.sort((a, b) => (a.time > b.time) ? -1 : 1)
-
         for(var i = 0; i < billsRs.rows.length; i++) {
             var itemQuery = `SELECT * FROM tradey_ks.bill_products_by_bill_id WHERE bill_id = ?;`
             var itemRs = await client.execute(itemQuery,[billsRs.rows[i].bill_id])
@@ -734,7 +762,7 @@ async function run() {
             for(var j = 0; j < itemRs.rows.length; j++) {
                 var productQuery = `SELECT * FROM tradey_ks.products_by_product_id WHERE product_id = ?;`
                 var productRs = await client.execute(productQuery,[itemRs.rows[j].product_id])
-                if(productRs.rows[0].seller_id === userId) {
+                if(productRs.rows[0].seller_id == userId) {
                     itemsOfSeller.push({...itemRs.rows[j],...productRs.rows[0]})
                 }
             }
@@ -743,6 +771,7 @@ async function run() {
                 finalRs.push({...billsRs.rows[i],billItems: itemsOfSeller})
             }
         }
+        finalRs.sort((a, b) => (a.time > b.time) ? -1 : 1)
         res.send(finalRs)
     })
 

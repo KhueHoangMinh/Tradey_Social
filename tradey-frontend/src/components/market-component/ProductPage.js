@@ -15,6 +15,7 @@ function ProductPage(props) {
   const [loading,setLoading] = useState(0)
   const [loading1,setLoading1] = useState(0)
   const [seller, setSeller] = useState()
+  const [quantity,setQuantity] = useState(1)
 
   useEffect(()=>{
     Axios.post('/api/getproductbyid', {productId: state.productId})
@@ -34,9 +35,11 @@ function ProductPage(props) {
   },[state])
 
   const handleAdd = () => {
-    Axios.post('/api/addtocart', {userId: user.user_id, productId: product.product_id, action: 'add'})
-    .then(res => {
-    })
+    if(quantity > 0) {
+      Axios.post('/api/addtocart', {userId: user.user_id, productId: product.product_id, quantity: quantity, action: 'add'})
+      .then(res => {
+      })
+    }
   }
   return (
     <div>
@@ -63,6 +66,12 @@ function ProductPage(props) {
                     <span className='price'>$ {product ? product.price:''}</span>
                 </div>
                 <div className='add-btn' >
+                  <div className='quantity-input'>
+                    x
+                    <input type='text' value={quantity} onChange={(e)=>{
+                      if(!isNaN(parseInt(e.target.value)) || e.target.value == "") setQuantity(e.target.value)
+                    }}/>
+                  </div>
                   <Button 
                     text='Add to Cart'
                     function={handleAdd}
@@ -230,6 +239,27 @@ h1 {
 }
 .add-btn {
   margin: 0 auto;
+  display: flex;
+  .quantity-input {
+    color: black;
+    padding: 12px;
+    background-color: white;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: 700;
+    margin-right: 15px;
+    input {
+      border: none;
+      outline: none;
+      background-color: transparent;
+      width: 20px;
+      font-size: 20px;
+      font-weight: 700;
+      padding: 0;
+      margin: 0;
+    }
+  }
 }
 `
 

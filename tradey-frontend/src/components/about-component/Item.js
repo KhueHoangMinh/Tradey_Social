@@ -1,5 +1,5 @@
 import Axios from 'axios'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import PopUp from '../PopUp'
@@ -12,24 +12,20 @@ function Item(props) {
   const [image,setImage]= useState()  
   const [openDelete,setOpenDelete] = useState(null)
   const [openEdit,setOpenEdit] = useState(null)
+  const [quantity,setQuantity] = useState(props.quantity)
 
   
   const navigate = useNavigate()
+
+  useEffect(()=>{
+    setQuantity(props.quantity)
+  },[props.quantity])
 
   const handleNav = () => {
     navigate('/marketproduct',{state: {
       productId: props.productId,
       type: props.type
     }})
-  }
-
-
-  const handleCancel = () => {
-    setEditting(false)
-    setName(null)
-    setDescription(null)
-    setPrice(null)
-    setImage(null)
   }
 
   const handleDelete = () => {
@@ -68,6 +64,17 @@ function Item(props) {
     })
   }
 
+  const changeQuant = (action) => {
+    Axios.post('/api/changecartquant', {userId: props.userId, productId: props.productId, action: action})
+    .then(res=> {
+      if(quantity != parseInt(res.data.quantity) && res.data.quantity > 0) {
+        setQuantity(parseInt(res.data.quantity))
+      } else if (res.data.quantity == 0) {
+        props.setChange(!props.change)
+      }
+    })
+  }
+
   return (
       <ItemPanel>
         <div className='product-info'>
@@ -84,11 +91,17 @@ function Item(props) {
              <span className='price'>${price?price:props.productPrice}</span>
             </div>
             <div className='btns'>
-              {props.type === 3 || props.type === 4 &&
+              {(props.type === 3 || props.type === 4) &&
               <>
-                {props.type === 3 ? <button className='quant-btn'>-</button> : ''}
-                x{props.quantity ? props.quantity : 'NaN'}
-                {props.type === 3 ? <button className='quant-btn'>+</button> : ''}
+                {props.type === 3 ? <button className='quant-btn' onClick={()=>{
+                    if(quantity > 0) setQuantity(quantity - 1)
+                    changeQuant("dec")
+                  }}>-</button> : ''}
+                x{quantity}
+                {props.type === 3 ? <button className='quant-btn' onClick={()=>{
+                    setQuantity(quantity + 1)
+                    changeQuant("inc")
+                  }}>+</button> : ''}
               </>
               }
               {props.type === 1 &&
@@ -304,6 +317,7 @@ h2 {
           justify-content: center;
           font-size: 18px;
           font-weight: 500;
+          user-select: none;
           background-color: rgba(255,255,255,0.1);
           color: white;
           border: 1px solid rgba(255,255,255,0.5);
@@ -324,6 +338,7 @@ h2 {
           justify-content: center;
           font-size: 18px;
           font-weight: 600;
+          user-select: none;
           background-color: rgba(255,255,255,0.1);
           color: white;
           border: 1px solid rgba(255,255,255,0.5);

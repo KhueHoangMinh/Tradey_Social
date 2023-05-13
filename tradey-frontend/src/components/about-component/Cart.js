@@ -13,7 +13,6 @@ function Cart() {
   const [total, setTotal] = useState(0)
   const [change,setChange] = useState(true)
   const [loading,setLoading] = useState(0)
-  var calTotal = 0
   
   const navigate = useNavigate()
 
@@ -29,6 +28,14 @@ function Cart() {
     })
   },[change])
 
+  useEffect(()=> {
+    var sum = 0
+    for(var i = 0; i < marketCart.length; i++) {
+      sum += marketCart[i].price * marketCart[i].quantity 
+    }
+    setTotal(sum)
+  },[marketCart])
+
   return (
     <div>
       <CartPanel>
@@ -40,15 +47,17 @@ function Cart() {
               {
                   marketCart.map((item)=>(
                     <>
-                      <a style={{display: 'none'}}>{calTotal += item.price* item.quantity}</a>
                       <Item 
                         type = {3}
+                        userId = {user.user_id}
                         productId={item ? item.product_id:''}
                         productName={item ? item.product_name:''}
                         productDescription={item ? item.description:''}
                         productPrice={item ? item.price:''}
                         productImage={item ? item.image:''}
                         quantity={item ? item.quantity:''}
+                        change = {change}
+                        setChange = {setChange}
                       />
                     </>
                   ))
@@ -59,7 +68,7 @@ function Cart() {
         {
           marketCart.length > 0 ? (
           <Checkout>
-            <h2>Total: <span className='price'>$ {calTotal}</span></h2>
+            <h2>Total: <span className='price'>$ {total}</span></h2>
             <Button 
               text='Check out'
               function={handleNav}

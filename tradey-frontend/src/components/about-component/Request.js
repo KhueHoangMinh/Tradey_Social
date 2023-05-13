@@ -2,8 +2,9 @@ import React, {useEffect, useState} from 'react'
 import styled from 'styled-components'
 import Axios from 'axios'
 import Loading from '../Loading'
+import Item from './Item'
 
-function Item(props) {
+function Itemmmm(props) {
   const [product,setProduct] = useState()
 
   useEffect(()=>{
@@ -108,7 +109,14 @@ function SingleRequest(props) {
                     {
                         props.order.billItems.map((item)=>(
                             <Item
-                                productId = {item.product_id}
+                              type = {4}
+                              userId = {user.user_id}
+                              productId={item ? item.product_id:''}
+                              productName={item ? item.product_name:''}
+                              productDescription={item ? item.description:''}
+                              productPrice={item ? item.price:''}
+                              productImage={item ? item.image:''}
+                              quantity={item ? item.quantity:''}
                             />
                         ))
                     }
@@ -125,6 +133,7 @@ function Request(props) {
   useEffect(()=>{
       Axios.post('/api/getrequests',{userId: props.user.user_id})
       .then(res=>{
+        console.log(res.data)
           setOrders(res.data)
           setLoading(1)
       })
