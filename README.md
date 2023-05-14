@@ -19,12 +19,13 @@ Node version: v18.14.0
 > cd ..
 6. Open terminal and type "ipconfig" to get your IPv4 address
 7. Open file "tradey-frontend/src/index.js", then change "window.baseHost" to "http://[YOUR_IPv4]" (e.g. "http://192.168.1.7")
-8. Open file "tradey-backend/index.js", then change "FRONTEND" to "http://[YOUR_IPv4]" (e.g. "http://192.168.1.7")
-9. Open a new terminal and type:
+8. Open file "tradey-frontend/package.json", then change "proxy" to "http://[YOUR_IPv4]:3001" (e.g. "http://192.168.1.7:3001")
+9. Open file "tradey-backend/index.js", then change "FRONTEND" to "http://[YOUR_IPv4]" (e.g. "http://192.168.1.7")
+10. Open a new terminal and type:
 > cd tradey-backend
 
 > npm start
-10. Open a new terminal and type:
+11. Open a new terminal and type:
 > cd tradey-frontend
 
 > npm start

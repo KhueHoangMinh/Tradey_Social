@@ -36,7 +36,7 @@ function Comment(props) {
                 {react: 'angry',quant: 0}
             ]
             for(var i = 0; i < res.data.length; i++) {
-                if(cmtContent && res.data[i].liker_id === cmtContent.user_id) {
+                if(cmtContent && res.data[i].liker_id === props.userId) {
                     setCmtLiked(res.data[i])
                 }
                 switch(res.data[i].type) {
@@ -67,7 +67,7 @@ function Comment(props) {
     },[change, cmtContent])
 
     const handleCmtLike = (type) => {
-        Axios.post('/api/like',{postId: props.comment.comment_id, userId: cmtContent.user_id, type: type})
+        Axios.post('/api/like',{postId: props.comment.comment_id, userId: props.userId, type: type})
         .then(()=>{
             setChange(!change)
         })

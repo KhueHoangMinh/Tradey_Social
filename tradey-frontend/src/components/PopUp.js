@@ -18,6 +18,7 @@ function PopUp(props) {
 const Content = styled.div`
 height: fit-content;
 width: fit-content;
+max-width: 80vw;
 padding: 30px;
 border-radius: 15px;
 background-color: rgb(20,20,20);

@@ -805,6 +805,20 @@ async function run() {
         res.send([{...rs.rows[0], billItems: marketItemRs.rows}])
     })
 
+    app.post("/api/changeorderstatus", async (req,res) => {
+        const orderId = req.body.orderId
+        const newStatus = req.body.status
+        const userId = req.body.userId
+
+        const query = `BEGIN BATCH
+        UPDATE tradey_ks.bills_by_bill_id SET status = ? WHERE bill_id = ?;
+        UPDATE tradey_ks.bills_by_user_id SET status = ? WHERE user_id = ? AND bill_id = ?;
+        APPLY BATCH;`
+        await client.execute(query, [newStatus,orderId,newStatus,userId,orderId])
+
+        res.send("updated")
+    })
+
     app.post('/api/getuserbyid', async (req,res)=> {
         const userId = req.body.userId
         const query = 'SELECT type, user_id, name, email, photourl FROM tradey_ks.users_by_user_id WHERE user_id = ?;'

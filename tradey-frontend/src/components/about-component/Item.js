@@ -90,7 +90,9 @@ function Item(props) {
             <div className='info'>
              <span className='price'>${price?price:props.productPrice}</span>
             </div>
-            <div className='btns'>
+            {
+              props.type != 2 && 
+              <div className='btns'>
               {(props.type === 3 || props.type === 4) &&
               <>
                 {props.type === 3 ? <button className='quant-btn' onClick={()=>{
@@ -111,6 +113,7 @@ function Item(props) {
               </>
               }
             </div>
+            }
           </div>
         </div>
         {

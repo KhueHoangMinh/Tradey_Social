@@ -35,6 +35,7 @@ function Comments(props) {
             {props.comments && props.comments.map(comment=>(
                 <Comment
                     postId = {props.postId}
+                    userId = {props.userId}
                     comment = {comment}
                     change = {props.change}
                     setChange = {props.setChange}

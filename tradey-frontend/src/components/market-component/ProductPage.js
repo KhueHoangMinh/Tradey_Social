@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Axios from 'axios'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import Loading from '../Loading'
 import Item from './Item'
@@ -14,6 +14,7 @@ import PopUp from '../PopUp'
 function ProductPage(props) {
   const {state} = useLocation()
   const user = useSelector(state => state.auth.user)
+  const navigate = useNavigate()
   const [product,setProduct] = useState()
   const [productsFromShop, setProductsfromShop] = useState([])
   const [loading,setLoading] = useState(0)
@@ -108,7 +109,7 @@ useEffect(()=>{
               {react: 'angry',quant: 0}
           ]
           for(var i = 0; i < res.data.length; i++) {
-              if(res.data[i].liker_id === user.user_id) {
+              if(user && res.data[i].liker_id === user.user_id) {
                   setLiked(res.data[i])
               }
               switch(res.data[i].type) {
@@ -141,11 +142,17 @@ useEffect(()=>{
       .then(res=>setShares(res.data.shares))
 },[change])
 
+const viewUserPage = (userId) => {
+  navigate('/about',{state: {
+      userId: userId
+  }})
+}
+
   return (
     <div>
           <Container>
           {
-            loading === 1 ? (
+            user && loading === 1 ? (
             <div className='content'>
               <img className='background-image' src={product ? window.host + product.image:''} alt=''/>
               <div className='image-container'>
@@ -155,7 +162,9 @@ useEffect(()=>{
                 <div className='user-detail'>
                   <img src={seller ? (seller.photourl ? window.host + seller.photourl:'/images/user.png'):'/images/user.png'} alt=''/>
                     <div>
-                      <h3><a href='https://youtube.com'>{seller ? seller.name:''}</a></h3>
+                      <h3 onClick={()=>{
+                    viewUserPage(seller && seller.user_id)
+                  }}>{seller ? seller.name:''}</h3>
                       <span>{seller ? seller.email:''}</span>
                       <span>{product ? product.time:''}</span>
                     </div>
@@ -223,7 +232,7 @@ useEffect(()=>{
             {
             <Comments
                 postId = {state.productId}
-                userId = {user.user_id}
+                userId = {user && user.user_id}
                 comments = {comments}
                 change = {cmtChange}
                 setChange = {setCmtChange}
@@ -356,13 +365,12 @@ flex-direction: column;
       padding: 0;
       margin: 0;
       margin-bottom: 1px;
-      a {
-        text-decoration: none;
-        color: rgba(255,255,255,0.9);
-        transition: 0.2s ease-in-out;
-        &:hover {
-          color: rgba(255,255,255,1);
-        }
+      text-decoration: none;
+      color: rgba(255,255,255,0.9);
+      transition: 0.2s ease-in-out;
+      &:hover {
+        cursor: pointer;
+        color: rgba(255,255,255,1);
       }
     }
 

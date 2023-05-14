@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import Axios from 'axios'
 import Loading from '../Loading'
 import Item from './Item'
+import Button from '../Button'
+import PopUp from '../PopUp'
 
 function Itemmmm(props) {
   const [product,setProduct] = useState()
@@ -74,12 +76,35 @@ function Itemmmm(props) {
 
 function SingleRequest(props) {
   const [user,setUser] = useState()
+  const [total,setTotal] = useState(0)
+  const [status,setStatus] = useState(props.order.status)
+  const [popUp,setPopUp] = useState(false)
+  
+  const calTotal = () => {
+    var sum = 0
+    for(var i = 0; i < props.order.billItems.length; i++) {
+      sum += props.order.billItems[i].price * props.order.billItems[i].quantity
+    }
+    setTotal(sum)
+  }
+
   useEffect(()=>{
       Axios.post('/api/getuserbyid',{userId: props.order.user_id})
       .then(res=>{
           setUser(res.data[0])
       })
+      
+  calTotal()
   },[])
+
+  const changeStatus = (status) => {
+    Axios.post("/api/changeorderstatus", {orderId: props.order.bill_id, userId: props.order.user_id, status: status})
+    .then(res=>{
+      if(res.data === "updated") setStatus(status)
+      setPopUp(false)
+    })
+  }
+
     return (
         <div>
             <RequestPanel>
@@ -109,13 +134,17 @@ function SingleRequest(props) {
                     <strong>Note: </strong>
                     <span>{props.order.note}</span>
                   </div>
+                  <div className='indiv-order-info'>
+                    <strong>Status: </strong>
+                    <span className={`status ${status.toLowerCase()}`}>{status}</span>
+                  </div>
                 </div>
                 <div className='item-list'>
                     {
                         props.order.billItems.map((item)=>(
                             <Item
                               type = {4}
-                              userId = {user.user_id}
+                              userId = {user && user.user_id}
                               productId={item ? item.product_id:''}
                               productName={item ? item.product_name:''}
                               productDescription={item ? item.description:''}
@@ -126,11 +155,65 @@ function SingleRequest(props) {
                         ))
                     }
                 </div>
-                <button className='done-btn'>Done</button>
+                <h2>Total: <span className='price'>${total}</span></h2>
+                <div className='btn-box'>
+                  <Button
+                    text = "Change status"
+                    function = {()=>{
+                      setPopUp(true)
+                    }}
+                  />
+                </div>
+                {
+                  popUp &&
+                  <PopUp
+                    close = {()=>{setPopUp(false)}}
+                    content = {
+                      <>
+                      <h2>Change Order Status</h2>
+                      <StatusButtons>
+                        <Button
+                          text = "PENDING"
+                          function = {()=>{
+                            changeStatus("PENDING")
+                          }}
+                        />
+                        <Button
+                          text = "PROCESSING"
+                          function = {()=>{
+                            changeStatus("PROCESSING")
+                          }}
+                        />
+                        <Button
+                          text = "DELIVERING"
+                          function = {()=>{
+                            changeStatus("DELIVERING")
+                          }}
+                        />
+                        <Button
+                          text = "DELIVERED"
+                          function = {()=>{
+                            changeStatus("DELIVERED")
+                          }}
+                        />
+                      </StatusButtons>
+                      </>
+                    }
+                  />
+                }
             </RequestPanel>
         </div>
     )
 }
+
+
+const StatusButtons = styled.div`
+display: flex;
+flex-wrap: wrap;
+button {
+  margin: 10px 10px;
+}
+`
 
 function Request(props) {
   const [orders, setOrders] = useState([])
@@ -187,9 +270,25 @@ margin-bottom: 20px;
   }
 }
 .order-info {
+  margin-bottom: 20px;
   .indiv-order-info {
     display: grid;
     grid-template-columns: 80px 1fr;
+    .status {
+      font-weight: 600;
+    }
+    .status.pending {
+      color: red;
+    }
+    .status.processing {
+      color: orange;
+    }
+    .status.delivering {
+      color: yellow;
+    }
+    .status.delivered {
+      color: green;
+    }
   }
 }
 .item-list {
@@ -197,22 +296,12 @@ margin-bottom: 20px;
     flex-direction: column;
     margin-bottom: 10px;
 }
-.done-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 30px;
-    width: 60px;
-    margin: 0 auto;
-    border-radius: 5px;
-    color: white;
-    font-weight: 600;
-    border: none;
-    background-color: rgba(51,255,255,0.3);
-    transition: 0.2s ease-in-out;
-    &:hover {
-        background-color: rgba(51,255,255,0.6);
-    }
+.btn-box {
+  width: fit-content;
+  margin: 0 auto;
+}
+.price {
+  color: lightgreen;
 }
 `
 

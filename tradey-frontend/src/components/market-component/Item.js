@@ -12,9 +12,10 @@ function Item(props) {
     }})
 
   }
+  
   return (
     <div>
-      <ItemPanel onClick={handleNav}>
+      <ItemPanel onClick={()=>handleNav()}>
         <div className='item-info'>
           <div className='item-top'>
             {
@@ -28,7 +29,7 @@ function Item(props) {
             <div className='user-detail'>
               <img src={props.userPhotoURL ? (window.host + props.userPhotoURL) : '/images/user.png'} alt=''/>
                 <div>
-                  <h3><a href='https://youtube.com'>{props.userDisplayName}</a></h3>
+                  <h3>{props.userDisplayName}</h3>
                   <span>{props.userEmail}</span>
                   <span>{props.productTime}</span>
                 </div>
@@ -109,13 +110,12 @@ color: white;
           padding: 0;
           margin: 0;
           margin-bottom: 1px;
-          a {
-            text-decoration: none;
-            color: rgba(255,255,255,0.9);
-            transition: 0.2s ease-in-out;
-            &:hover {
-              color: rgba(255,255,255,1);
-            }
+          text-decoration: none;
+          color: rgba(255,255,255,0.9);
+          transition: 0.2s ease-in-out;
+          z-index: 1;
+          &:hover {
+            color: rgba(255,255,255,1);
           }
         }
 

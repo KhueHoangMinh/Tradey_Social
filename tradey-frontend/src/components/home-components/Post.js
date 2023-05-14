@@ -142,6 +142,11 @@ function Post(props) {
             })
         }
     },[change])
+    const viewUserPage = (userId) => {
+        navigate('/about',{state: {
+            userId: userId
+        }})
+    }
 
   return (
     <Panel className='user-post'>
@@ -151,7 +156,13 @@ function Post(props) {
                     <div className='userinfo'>
                       <img className='user-image' crossOrigin='use-credentials' src={props.contentType !== 'shared' ? (postContent && (postContent.photourl ? window.host + postContent.photourl : '/images/user.png')) : (props.photoURL ? (window.host + props.photoURL) : '/images/user.png')} alt=''/>
                       <div>
-                        <h3 onClick={handleNav}>{props.contentType !== 'shared' ? (postContent && postContent.name) : props.displayName}</h3>
+                        <h3 onClick={()=>{
+                            if(props.contentType != 'shared') {
+                                viewUserPage(postContent && postContent.publisher_id)
+                            } else {
+                                viewUserPage(props.publisher_id)
+                            }
+                            }}>{props.contentType !== 'shared' ? (postContent && postContent.name) : props.displayName}</h3>
                         <span>{props.contentType !== 'shared' ? (postContent && postContent.email) : props.email}</span>
                         <span>{props.contentType !== 'shared' ? (postContent && postContent.time) : props.time}</span>
                       </div>
@@ -172,6 +183,7 @@ function Post(props) {
                                         email = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.email) : props.sharedContent.email}
                                         photoURL = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.photourl) : props.sharedContent.photourl}
                                         time = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.time) : props.sharedContent.time}
+                                        publisher_id = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.publisher_id) : props.sharedContent.publisher_id}
                                         description = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.description) : props.sharedContent.description}
                                         content = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.content) : props.sharedContent.content}
                                         type = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.type) : props.sharedContent.type}
@@ -186,6 +198,7 @@ function Post(props) {
                                         email = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.email) : props.sharedContent.email}
                                         photoURL = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.photourl) : props.sharedContent.photourl}
                                         time = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.time) : props.sharedContent.time}
+                                        publisher_id = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.publisher_id) : props.sharedContent.publisher_id}
                                         description = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.description) : props.sharedContent.description}
                                         content = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.content) : props.sharedContent.content}
                                         type = {props.contentType !== 'shared' ? (postContent && postContent.sharedContent.type) : props.sharedContent.type}
@@ -198,20 +211,22 @@ function Post(props) {
                             </div>
                         ) : ((postContent && postContent.type === 'shareproduct') || props.type === 'shareproduct' ?
                             (product &&
-                                <Item
-                                    userId = {props.userId}
-                                    sellerId = {product.user_id}
-                                    userPhotoURL = {product.photourl}
-                                    userDisplayName = {product.name}
-                                    userEmail = {product.email}
-                                    productTime = {product.time}
-                                    productId={product.product_id}
-                                    name={product.product_name}
-                                    description={product.description}
-                                    image={product.image}
-                                    price={product.price}
-                                    type={product.type}
-                                />
+                                <div className='content'>
+                                    <Item
+                                        userId = {props.userId}
+                                        sellerId = {product.user_id}
+                                        userPhotoURL = {product.photourl}
+                                        userDisplayName = {product.name}
+                                        userEmail = {product.email}
+                                        productTime = {product.time}
+                                        productId={product.product_id}
+                                        name={product.product_name}
+                                        description={product.description}
+                                        image={product.image}
+                                        price={product.price}
+                                        type={product.type}
+                                    />
+                                </div>
                             ) : (
                                 <div className='content'>
                                     {   
@@ -299,6 +314,12 @@ width: calc(100% - 60px);
     padding: 0;
     margin: 0;
     margin-bottom: 5px;
+    color: rgba(255,255,255,0.9);
+    transition: 0.2s ease-in-out;
+    &:hover {
+        cursor: pointer;
+    color: rgba(255,255,255,1);
+    }
     }
 
     span {
@@ -345,6 +366,9 @@ img {
     margin: 5px 0px;
     justify-content: space-around;
 }
+}
+@media (max-width: 1200px) {
+    width: calc(100vw - 100px);
 }
 `
 

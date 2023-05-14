@@ -2,18 +2,19 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import Item from './Item'
+import MarketItem from '../market-component/Item'
 import Axios from 'axios'
 import Loading from '../Loading'
 import PopUp from '../PopUp'
 
-function Shop() {
+function Shop(props) {
   const [name, setName] = useState()
   const [description, setDescription] = useState()
   const [price, setPrice] = useState()
   const [image, setImage] = useState()
   const [marketProducts,setMarketProducts] = useState([])
   const [loading,setLoading] = useState(0)
-  const user = useSelector(state=>state.auth.user)
+  const currentUser = useSelector(state=>state.auth.user)
   const [popUp,setPopUp] = useState(false)
   const [reload,setReload] = useState(false)
   const date = new Date()
@@ -22,7 +23,7 @@ function Shop() {
     e.preventDefault()
 
     const data = new FormData()
-    data.append('userId', user.user_id)
+    data.append('userId', currentUser.user_id)
     data.append('name', name)
     data.append('description', description)
     data.append('price', price)
@@ -42,7 +43,7 @@ function Shop() {
 
 
   useEffect(()=>{
-    Axios.post('/api/getproductbysellerid', {userId: user.user_id})
+    Axios.post('/api/getproductbysellerid', {userId: props.user.user_id})
     .then(res=> {
       setMarketProducts(res.data)
       setLoading(1)
@@ -54,13 +55,13 @@ function Shop() {
       <ProductsPage>
         <div className='header'>
           <h2>Your shop</h2>
-          <button className='add-btn' onClick={()=>setPopUp(true)}>Add</button>
+          {currentUser.user_id == props.user.user_id && <button className='add-btn' onClick={()=>setPopUp(true)}>Add</button>}
         </div>
         <div className='product-list'>
           {
             loading === 1 ? (marketProducts.map((product)=>(
               <Item
-                type={1}
+                type={2}
                 productId = {product ? product.product_id:''}
                 productName = {product ? product.product_name:''}
                 productDescription = {product ? product.description:''}

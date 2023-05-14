@@ -67,7 +67,7 @@ function About() {
                         break
                 }
             })
-        } else if(!state || (state.userId == currentUser.user_id)) {
+        } else if(!state || (currentUser && state.userId == currentUser.user_id)) {
             setUser(currentUser)
         }
     },[user])
@@ -332,7 +332,8 @@ img {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    padding: 10px 0;
+    margin-bottom: 10px;
+    object-fit: cover;
 }
 
 h3 {
