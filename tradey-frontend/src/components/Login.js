@@ -8,6 +8,7 @@ import { app } from '../firebase'
 import {getAuth, signInWithPopup, GoogleAuthProvider} from 'firebase/auth'
 import Axios from 'axios'
 import {useCookies} from 'react-cookie'
+import { Input } from './Input'
 
 
 function Login() {
@@ -76,14 +77,54 @@ function Login() {
 
   return (
       <Container>
-      <img className='logo' src='/images/png/logo-no-background.png' alt=''/>
+      <div class="login-bg">
+          <div>
+              <h1><span className='red'>Trade Trade</span> Trade <span className='blue'>Trade  </span> Trade
+                  <span className='red'>Trade Trade</span> Trade <span className='blue'>Trade  </span> Trade&nbsp;
+              </h1>
+          </div>
+          <div>
+              <h1>buy <span className='red'>something</span> buy <span className='yellow'>something</span>
+                  buy <span className='red'>something</span> buy <span className='yellow'>something</span>&nbsp;
+              </h1>
+          </div>
+          <div>
+              <h1>Let's go <span className='green'>stonkkk</span> Let's <span className='yellow'>stonkkk</span>
+                  Let's go <span className='green'>stonkkk</span> Let's <span className='yellow'>stonkkk</span>&nbsp;
+              </h1>
+          </div>
+          <div>
+              <h1><span className='blue'>#TradingIsALifeStyle </span>#TradingIsALifeStyle
+                  <span className='blue'>#TradingIsALifeStyle </span>#TradingIsALifeStyle&nbsp;</h1>
+          </div>
+          <div>
+              <h1>$hopping <span className='green'> $hopping $hopping</span>  $hopping
+                  $hopping <span className='green'> $hopping $hopping</span>  $hopping&nbsp;</h1>
+          </div>
+      </div>
         <LoginForm onSubmit={e=>handleLogin(e)}>
-                <h2>LOGIN</h2>
-                <div>
-                    <label>Username:</label>
-                    <input className='inputfield' type='text' value={username} onChange={(e)=>{setUsername(e.target.value)}}/>
-                    <label>Password:</label>
-                    <input className='inputfield' type='password' value={password} onChange={(e)=>{setPassword(e.target.value)}}/>
+                <div className='logo-box'>
+                    <img className='logo' src='/images/png/logo-no-background.png' alt=''/>
+                    <h2>LOGIN</h2>
+                </div>
+                <div className='inputs'>
+                    
+                    <Input
+                        type={'text'}
+                        name={'username'}
+                        value={username}
+                        setValue={setUsername}
+                        id={'username'}
+                        label={'Email'}
+                    />
+                    <Input
+                        type={'password'}
+                        name={'password'}
+                        value={password}
+                        setValue={setPassword}
+                        id={'password'}
+                        label={'Password'}
+                    />
                 </div>
                     {errors === 'no_match' ? <Error>Email or password does not match.</Error>:<></>}
                     {errors === 'no_account' ? <Error>No account with this email exists.</Error>:<></>}
@@ -102,102 +143,178 @@ display: flex;
 flex-direction: column;
 align-items: center;
 justify-content: center;
-background-image: radial-gradient(farthest-corner at 75% 70%, rgba(55,55,55,1), rgba(0,0,0,1));
+background-color: rgb(30, 30, 30);
 height: 100vh;
 width: 100vw;
 margin: 0;
 padding: 0;
-.logo {
-    height: 100px;
-    margin:30px;
+.login-bg {
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    height: fit-content;
+    width: fit-content;
+    background-color: rgb(30, 30, 30);
+    color: rgba(255,255,255,0.02);
+    left: 0;
+    z-index: 0;
+    user-select: none;
+    /* transform: rotate(10deg) rotateY(10deg); */
+}
+
+.login-bg div {
+    position: relative;
+    width: fit-content;
+}
+
+.login-bg h1 {
+    position: relative;
+    left: 0;
+    white-space: nowrap;
+    text-transform: uppercase;
+    padding: 0 0;
+    margin: 0 0;
+}
+.red {
+    color: rgba(255,255,255,0.07);
+}
+.green {
+    color: rgba(255,255,255,0.08);
+}
+.blue {
+    color: rgba(255,255,255,0.03);
+}
+.yellow {
+    color: rgba(255,255,255,0.1);
+}
+
+@keyframes text-move {
+    0% {
+        left: 0;
+    }
+    100% {
+        left: -50%;
+    }
+}
+
+.login-bg div:nth-child(1) h1{
+    font-size: 10vh;
+    line-height: 10vh;
+    animation: text-move 10s infinite linear;
+}
+
+.login-bg div:nth-child(2) h1{
+    font-size: 25vh;
+    line-height: 25vh;
+    animation: text-move 15s infinite linear;
+}
+
+.login-bg div:nth-child(3) h1{
+    font-size: calc(40vh - 80px);
+    line-height: calc(40vh - 80px);
+    animation: text-move 25s infinite linear;
+}
+
+.login-bg div:nth-child(4) h1{
+    font-size: 15vh;
+    line-height: 15vh;
+    animation: text-move 18s infinite linear;
+}
+
+.login-bg div:nth-child(5) h1{
+    font-size: 10vh;
+    line-height: 10vh;
+    animation: text-move 10s infinite linear;
 }
 `
 
 const LoginForm = styled.form`
 color: rgb(200,200,200);
-background-color: rgba(200,200,200,0.2);
+background-color: rgba(0,0,0,0.5);
 padding: 30px;
+padding-top: 0;
 display: flex;
 flex-direction: column;
 align-items: center;
 justify-content: center;
 height: fit-content;
+overflow: hidden;
 width: 30%;
+min-width: 300px;
 border-radius: 8px;
 box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
-div {
+z-index:  1;
+.logo-box {
+    background-color: black;
+    margin-bottom: 30px;
+    padding: 20px;
+    width: calc(100% + 40px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .logo {
+        height: 80px;
+        z-index: 1;
+    }
+    h2 {
+        color: white;
+        margin: 0;
+        padding: 0;
+        font-size: 40px;
+        font-weight: 600;
+        letter-spacing: 3px;
+    }
+}
+.inputs {
     display: flex;
     flex-direction: column;
     width: 100%;
     max-width: 350px;
-    label {
-        font-weight: 100;
-        margin-bottom: 5px;
-    }
-    input {
-        width: 100%;
-        height: 30px;
-        background-image: none;
-        background-color: rgb(50,50,50);
-        margin-bottom: 15px;
-        border: 1px transparent;
-        border-radius: 2px;
-        color: rgb(200,200,200);
-
-        &:focus {
-            background-color: rgb(80,80,80);
-            border: 1px rgba(51,255,255,1);
-        }
-    }
-}
-h2 {
-    color: rgba(51,255,255,1);
-    margin: 0;
-    padding: 0;
-    padding-bottom: 20px;
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: 3px;
 }
 
 .login-btns {
     display: flex;
     flex-direction: row;
+    width: 100%;
+    max-width: 350px;
     margin: 15px 0px 25px 0;
-    .normal-login {
-        height: 40px;
-        width: 50%;
-        margin-right: 20px;
-        background-color: rgba(51,255,255,0.5);
-        transition: 0.2s ease-in-out;
-        font-weight: 500;
-        border-radius: 3px;
-        border: none;
-        color: white;
-        font-weight: 600;
-        &:hover {
-            background-color: rgb(51,255,255,0.9);
-        }
-    }
-    .google-login {
+    position: relative;
+    button {
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: center;
         height: 40px;
         width: 50%;
-        background-color: rgba(255,255,255,0.9);
         transition: 0.2s ease-in-out;
-        font-weight: 500;
-        border-radius: 3px;
+        font-weight: 700;
+        font-size: 18px;
+        border-radius: 8px;
         border: none;
+        color: white;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+    .normal-login {
+        background-color: rgba(255,255,255,0.3);
+        color: white;
+        margin-right: 20px;
+        &:hover {
+            background-color: rgb(255,255,255,0.9);
+            color: black;
+        }
+    }
+    .google-login {
+        background-color: rgba(255,255,255,1);
         color: black;
-        font-weight: 600;
+        border: 1px solid white;
         img {
             width: 30px;
         }
         &:hover {
-            background-color: rgb(255,255,255,1);
+            background-color: rgb(255,255,255,0.1);
+            color: white;
         }
     }
 }
@@ -215,6 +332,13 @@ span {
     }
 }
 @media (max-width: 1200px) {
+    .logo-box {
+        flex-direction: column;
+        justify-content: center;
+        h2 {
+            margin-top: 20px;
+        }
+    }
     .login-btns {
         flex-direction: column;
         .normal-login {

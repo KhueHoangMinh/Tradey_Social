@@ -43,7 +43,7 @@ const InputStyle = styled.div`
 }
 .group input {
     font-size:18px;
-    padding:10px 10px 10px 5px;
+    padding:10px 5px 10px 5px;
     display:block;
     width: calc(100% - 10px);
     border:none;
@@ -79,7 +79,11 @@ const InputStyle = styled.div`
 }
 
 /* BOTTOM BARS */
- .group .bar { position:relative; display:block; width:320px; }
+ .group .bar { 
+    position:relative; 
+    display:block; 
+    width:100%; 
+    }
  .group .bar:before, .bar:after {
     content:'';
     height:2px; 
