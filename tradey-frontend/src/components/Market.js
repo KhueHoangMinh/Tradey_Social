@@ -76,36 +76,41 @@ function Market() {
   },[marketItemList])
 
   const handleMarketPage = (page) =>{
-    marketItems = []
-    prevPage = marketPage
-    if(page === marketPageTotal) {
-      for(var i=(page-1)*21;i<marketItemList.length;i++) {
-        marketItems.push(marketItemList[i])
-      }
-      setDisplayMarket((items) =>{
-        if(marketPage == prevPage) {
-          return marketItems
-        } else {
-          return items
+      marketItems = []
+      prevPage = marketPage
+      if(page === marketPageTotal) {
+        for(var i=(page-1)*21;i<marketItemList.length;i++) {
+          marketItems.push(marketItemList[i])
         }
-      })
-      return
-    } else if(marketPageTotal > 0) {
-      for(var i=(page-1)*21;i<(page-1)*21+21;i++) {
-        marketItems.push(marketItemList[i])
-      }
-      setDisplayMarket((items) =>{
-        if(marketPage == prevPage) {
-          return marketItems
-        } else {
-          return items
+        setDisplayMarket((items) =>{
+          if(marketPage == prevPage) {
+            return marketItems
+          } else {
+            return items
+          }
+        })
+        return
+      } else if(marketPageTotal > 0) {
+        for(var i=(page-1)*21;i<(page-1)*21+21;i++) {
+          marketItems.push(marketItemList[i])
         }
-      })
-    }
+        setDisplayMarket((items) =>{
+          if(marketPage == prevPage) {
+            return marketItems
+          } else {
+            return items
+          }
+        })
+      }
   }
 
   useEffect(()=> {
-    handleMarketPage(marketPage)
+    var productList = document.getElementById("main-product-list")
+    productList.style.opacity = 0
+    setTimeout(() => {
+      handleMarketPage(marketPage)
+    productList.style.opacity = 1
+  }, 200);
   },[marketPage])
 
   function PageBtn (i,cur,set) {
@@ -193,10 +198,12 @@ useEffect(()=>{
               </div>
             </PagePanel>
           </LeftSide>
-          <Main 
-            user={user}
-            marketItemList = {displayMarket}
-            loading = {loading}/>
+          <div id='main-product-list'>
+            <Main 
+              user={user}
+              marketItemList = {displayMarket}
+              loading = {loading}/>
+          </div>
         </MarketPage>
     </div>
   )
@@ -213,6 +220,9 @@ background-image: radial-gradient(farthest-corner at 75% 70%, rgb(20,20,20), rgb
 min-height: calc(100vh - 80px);
 height: fit-content;
 color: rgb(230,230,230);
+#main-product-list {
+  transition: 0.2s ease-in-out;
+}
 @media (max-width: 1200px) {
   display: flex;
   flex-direction: column;

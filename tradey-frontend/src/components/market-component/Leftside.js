@@ -105,7 +105,7 @@ h2 {
     outline: none;
     border-radius: 4px;
     color: white;
-    background-color: rgba(90,90,90);
+    background-color: rgba(25,25,25,1);
     border: none;
     option {
       border-radius: 4px;

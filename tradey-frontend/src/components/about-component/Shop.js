@@ -61,7 +61,7 @@ function Shop(props) {
           {
             loading === 1 ? (marketProducts.map((product)=>(
               <Item
-                type={2}
+                type={currentUser.user_id == props.user.user_id ? 1 : 2}
                 productId = {product ? product.product_id:''}
                 productName = {product ? product.product_name:''}
                 productDescription = {product ? product.description:''}
