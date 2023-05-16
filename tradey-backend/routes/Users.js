@@ -19,6 +19,8 @@ const client = new Client({
 
 client.connect();
 
+// API to register new account
+
 router.post('/register', async (req,res) => {
     const type = req.body.type
     const name = req.body.name
@@ -49,6 +51,7 @@ router.post('/register', async (req,res) => {
     }
 })
 
+// API to regular login
 
 router.post('/login', async (req,res) => {
     const email = req.body.email
@@ -64,6 +67,8 @@ router.post('/login', async (req,res) => {
     });
 })
 
+// API to login using Google account
+
 router.post('/googlelogin', async (req,res) => {
     const email = req.body.email
     const query = `SELECT user_id, type, name, email, photourl FROM tradey_ks.users_by_email where type = 'googleuser' AND email = ?;`
@@ -76,6 +81,8 @@ router.post('/googlelogin', async (req,res) => {
         }
     });
 })
+
+// API to add a product to user's cart
 
 router.post('/addtocart', async (req,res)=> {
     const productId = req.body.productId
@@ -122,6 +129,8 @@ router.post('/addtocart', async (req,res)=> {
     }
 })
 
+// API to get all product exist in user's cart
+
 router.post('/getcart', async (req,res) => {
     const userId = req.body.userId
     
@@ -138,6 +147,8 @@ router.post('/getcart', async (req,res) => {
 
     res.send(finalRs)
 })
+
+// API to change quantity of cart products
 
 router.post("/changecartquant", async  (req,res) => {
     const userId = req.body.userId
@@ -168,6 +179,8 @@ router.post("/changecartquant", async  (req,res) => {
         res.send({quantity: quantity})
     }
 })
+
+// API to checkout and make bill
 
 router.post('/checkout', async (req,res) => {
     const userId = req.body.userId
@@ -217,6 +230,8 @@ router.post('/checkout', async (req,res) => {
     }
 })
 
+// API to get all user's bills
+
 router.post('/getshopbills', async (req,res) => {
     var finalRs = []
 
@@ -238,6 +253,8 @@ router.post('/getshopbills', async (req,res) => {
     }
     res.send(finalRs)
 })
+
+// API to get order requests from others
 
 router.post('/getrequests', async (req,res) => {
     const userId = req.body.userId
@@ -267,6 +284,8 @@ router.post('/getrequests', async (req,res) => {
     res.send(finalRs)
 })
 
+// API to get all user's bills
+
 router.post('/getbillsbyuser', async (req,res) => {
     const userId = req.body.userId
     var finalRs = []
@@ -290,6 +309,8 @@ router.post('/getbillsbyuser', async (req,res) => {
     res.send(finalRs)
 })
 
+// API to get bill information by bill ID
+
 router.post('/getbillbybillid', async (req,res) => {
     const billId = req.body.billId
 
@@ -307,6 +328,8 @@ router.post('/getbillbybillid', async (req,res) => {
     res.send([{...rs.rows[0], billItems: marketItemRs.rows}])
 })
 
+// API to change status of an order
+
 router.post("/changeorderstatus", async (req,res) => {
     const orderId = req.body.orderId
     const newStatus = req.body.status
@@ -320,6 +343,8 @@ router.post("/changeorderstatus", async (req,res) => {
 
     res.send("updated")
 })
+
+// API to get user information by user ID
 
 router.post('/getuserbyid', async (req,res)=> {
     const userId = req.body.userId
@@ -343,6 +368,8 @@ var userfilename = ''
     })
 
     const userUpload = multer({storage: userStorage})
+    
+    // API to update user information
 
     router.post('/updateuserinfo', userUpload.single('avatar'),async (req,res)=>{
         const userId = req.body.userId
@@ -380,6 +407,8 @@ var userfilename = ''
         res.send('updated')
     })
 
+    // API to get all users
+
     router.post('/getusers', async (req,res) => {
         const query = `SELECT user_id,type,name,email,photourl FROM tradey_ks.users_by_user_id;`
 
@@ -387,6 +416,8 @@ var userfilename = ''
 
         res.send(rs.rows)
     })
+
+    // API to search for users by user name
 
     router.post('/searchuser', async (req,res) => {
         const name = req.body.name
@@ -403,6 +434,8 @@ var userfilename = ''
         res.send(finalRs)
     })
 
+    // API to get all previous messages between 2 users
+
     router.post('/getmessages', async (req,res) => {
         const senderId = req.body.userId
         const receiverId = req.body.chatting
@@ -418,6 +451,8 @@ var userfilename = ''
 
         res.send(finalRs)
     })
+
+    // API to change friend status with other user
 
     router.post("/addfriend", async (req,res) => {
         const userId = req.body.userId
@@ -462,6 +497,8 @@ var userfilename = ''
         }
     })
 
+    // API to check the friend status with other user
+
     router.post('/checkrelationship', async (req,res) => {
         const userId = req.body.userId
         const friendId = req.body.friendId
@@ -482,6 +519,8 @@ var userfilename = ''
             res.send("error")
         }
     })
+
+    // API to get friends of an user
 
     router.post('/getfriends', async (req,res) => {
         const userId = req.body.userId

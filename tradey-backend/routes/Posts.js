@@ -34,6 +34,8 @@ var filename = ''
 
     const postUpload = multer({storage: postStorage})
 
+    // API to post and share
+
     router.post('/post', postUpload.single('image'),async (req,res)=>{
         const publisherId = req.body.publisherId
         const description = req.body.description
@@ -79,6 +81,7 @@ var filename = ''
         res.send('posted')
     })
 
+    // API to get all posts
 
     router.get('/getposts', async (req,res) => {
         const query = "SELECT * FROM tradey_ks.posts_by_post_id;"
@@ -97,6 +100,7 @@ var filename = ''
         res.send(finalRs)
     })
 
+    // API to get post information by post ID
 
     router.post('/getpostbypostid', async (req,res) => {
         async function getPostByPostId(postId) {
@@ -127,6 +131,8 @@ var filename = ''
         res.send(rs)
     })
 
+    // API to get all likes and users who liked a post
+
     router.post('/getlikes', async (req,res) => {
         const postId = req.body.id
         const query = "SELECT * FROM tradey_ks.likes_by_time WHERE post_id = ?;"
@@ -134,6 +140,8 @@ var filename = ''
         const rs = await client.execute(query,[postId])
         res.send(rs.rows)
     })
+
+    // API to get all comments of a post
 
     router.post('/getcomments', async (req,res) => {
 
@@ -155,6 +163,8 @@ var filename = ''
         res.send(await getAllComments(postId))
     })
 
+    // API to get comment information by comment ID
+
     router.post('/getcommentbycommentid', async (req,res) => {
         const commentId = req.body.commentId
 
@@ -166,6 +176,8 @@ var filename = ''
 
         res.send([{...rs.rows[0],...userRs.rows[0]}])
     })
+
+    // API to count how many time a post was shared
 
     router.post('/getshares', async (req,res) => {
         const postId = req.body.id
@@ -181,6 +193,8 @@ var filename = ''
 
         res.send({shares: shares})
     })
+
+    // API to like a post
 
     router.post('/like', async (req,res)=> {
         const userId = req.body.userId
@@ -220,6 +234,8 @@ var filename = ''
         }
     })
 
+    // API to comment a post
+
     router.post('/comment', async(req,res)=> {
         const userId = req.body.userId
         const postId = req.body.postId
@@ -256,6 +272,8 @@ var filename = ''
     })
 
     const advertisementUpload = multer({storage: advertisementStorage})
+
+    // API to post an advertisement
 
     router.post('/postadvertisement', advertisementUpload.single('image'), async (req,res) => {
         const name = req.body.name

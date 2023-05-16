@@ -34,6 +34,8 @@ const marketStorage = multer.diskStorage({
 
 const marketUpload = multer({storage: marketStorage})
 
+// API to post a product
+
 router.post('/postproduct', marketUpload.single('image'), async (req,res) => {
     const sellerId = req.body.userId
     const name = req.body.name
@@ -63,8 +65,7 @@ router.post('/postproduct', marketUpload.single('image'), async (req,res) => {
     res.send('inserted')
 })
 
-
-
+// API to get all products
 
 router.get('/getmarket', async (req,res)=> {
     const query = `SELECT * FROM tradey_ks.products_by_seller_id;`
@@ -82,6 +83,8 @@ router.get('/getmarket', async (req,res)=> {
     res.send(finalRs)
 })
 
+// API to get posts by user ID
+
 router.post('/getuserposts', async (req,res) => {
     const userId = req.body.userId
     const query = `SELECT * FROM tradey_ks.posts_by_publisher_id WHERE publisher_id = ?;`
@@ -93,6 +96,8 @@ router.post('/getuserposts', async (req,res) => {
     res.send(rs.rows)
 })
 
+// API to get all products from an user
+
 router.post('/getproductbysellerid', async (req,res) => {
     const userId = req.body.userId
     const query = `SELECT * FROM tradey_ks.products_by_seller_id WHERE seller_id = ?;`
@@ -103,6 +108,8 @@ router.post('/getproductbysellerid', async (req,res) => {
 
     res.send(rs.rows)
 })
+
+// API to search for products by product name
 
 router.post('/search', async (req,res) => {
     var input = req.body.input
@@ -154,6 +161,8 @@ router.post('/search', async (req,res) => {
     res.send(finalRs)
 })
 
+// API to delete a product
+
 router.post('/deleteproduct', async (req,res) => {
     const productId = req.body.productId
     const selectQuery = `SELECT * FROM tradey_ks.products_by_product_id WHERE product_id = ?;`
@@ -186,6 +195,8 @@ const updateMarketStorage = multer.diskStorage({
 
 const updateMarketUpload = multer({storage: updateMarketStorage})
 
+// API to update a products information
+
 router.post('/updateproduct', updateMarketUpload.single('image'), async (req,res) => {
     const name = req.body.name
     const description = req.body.description
@@ -213,6 +224,8 @@ router.post('/updateproduct', updateMarketUpload.single('image'), async (req,res
     }
 })
 
+// API to get a product's information by product ID
+
 router.post('/getproductbyid', async (req,res) => {
     const productId = req.body.productId
     const query = `SELECT * FROM tradey_ks.products_by_product_id WHERE product_id = ?;`
@@ -227,6 +240,8 @@ router.post('/getproductbyid', async (req,res) => {
 
     res.send([{...rs.rows[0],...additional}])
 })
+
+// API to get highlighted products
 
 router.post('/gethighlighted', async (req,res) => {
     const query = `SELECT * FROM tradey_ks.bill_products_by_bill_id;`
