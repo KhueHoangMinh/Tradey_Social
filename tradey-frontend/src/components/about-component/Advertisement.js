@@ -83,7 +83,7 @@ function Advertisement() {
     data.append('link', link)
 
 
-    Axios.post('/api/postadvertisement', data, {
+    Axios.post('/api/posts/postadvertisement', data, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -94,7 +94,7 @@ function Advertisement() {
   }
 
   useEffect(()=>{
-    Axios.post('/api/getadvertisement', {userId: user.user_id})
+    Axios.post('app/api/posts/getadvertisement', {userId: user.user_id})
     .then(res=> {
       setAdvertisement(res.data)
     })

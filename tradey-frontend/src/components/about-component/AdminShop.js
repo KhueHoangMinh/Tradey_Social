@@ -26,7 +26,7 @@ function AdminShop() {
       data.append('image', image)
       data.append('type', 'shop')
 
-      Axios.post('/api/postproduct', data, {
+      Axios.post('/api/posts/postproduct', data, {
           headers: {
               'Content-Type': 'multipart/form-data'
           }
@@ -37,7 +37,7 @@ function AdminShop() {
     }
 
     useEffect(()=>{
-      Axios.post('/api/getproductbysellerid', {userId: user.user_id})
+      Axios.post('/api/market/getproductbysellerid', {userId: user.user_id})
       .then(res=> {
         setShopProducts(res.data)
       })

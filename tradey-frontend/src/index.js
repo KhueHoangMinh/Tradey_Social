@@ -13,7 +13,16 @@ window.baseHost = 'http://192.168.1.7'
 window.host = window.baseHost + ':3001/'
 
 window.socket = null
-if(!window.socket) window.socket = io.connect(window.baseHost + ':3002/')
+if(!window.socket) window.socket = io.connect(window.baseHost + ':3002/', 
+  {
+    // path: "/tradey-backend/us-central1/server/socket.io",
+    withCredentials: true,
+    // extraHeaders: {
+    //   "my-custom-header": "abcd"
+    // }
+  }
+)
+console.log(window.socket)
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

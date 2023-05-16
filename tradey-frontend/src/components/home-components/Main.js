@@ -12,7 +12,7 @@ function Main(props) {
   const [showingShareInput, setShowingShareInput] = useState()
   const user = useSelector(state=>state.auth.user)
   useEffect(()=>{
-    Axios.get('/api/getposts')
+    Axios.get('/api/posts/getposts')
     .then(res=>{
       setPosts(res.data)
       setLoading(1)

@@ -12,7 +12,7 @@ function Comments(props) {
     const handleComment = (e) => {
         e.preventDefault()
         setLoading(0)
-        Axios.post('/api/comment', {postId: props.postId, userId: props.userId, content: userComment})
+        Axios.post('/api/posts/comment', {postId: props.postId, userId: props.userId, content: userComment})
         .then(res=>{
             props.setChange(!props.change)
             setUserComment('')

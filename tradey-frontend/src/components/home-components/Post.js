@@ -26,11 +26,11 @@ function Post(props) {
     useEffect(()=>{
         if(props.contentType !== 'shared') {
             setLoading(0)
-            Axios.post('/api/getpostbypostid', {postId: props.id})
+            Axios.post('/api/posts/getpostbypostid', {postId: props.id})
             .then(res=>{
                 setPostContent(res.data)
                 if(res.data.type === 'shareproduct') {
-                    Axios.post('/api/getproductbyid', {productId: res.data.content[0].source, addPublisher: true})
+                    Axios.post('/api/market/getproductbyid', {productId: res.data.content[0].source, addPublisher: true})
                     .then(res2=>{
                         setProduct(res2.data[0])
                     })
@@ -40,7 +40,7 @@ function Post(props) {
         }
         if(props.type === 'shareproduct') {
             setLoading(0)
-            Axios.post('/api/getproductbyid', {productId: props.content[0].source, addPublisher: true})
+            Axios.post('/api/market/getproductbyid', {productId: props.content[0].source, addPublisher: true})
             .then(res2=>{
                 setProduct(res2.data[0])
                 setLoading(1)
@@ -53,7 +53,7 @@ function Post(props) {
     }
 
     const handleLike = (type) => {
-        Axios.post('/api/like',{postId: props.id, userId: props.userId, type: type})
+        Axios.post('/api/posts/like',{postId: props.id, userId: props.userId, type: type})
         .then(()=>{
             setChange(!change)
         })
@@ -85,7 +85,7 @@ function Post(props) {
 
     useEffect(()=>{
         if(props.contentType !== 'shared') {
-            Axios.post('/api/getcomments',{id: props.id})
+            Axios.post('/api/posts/getcomments',{id: props.id})
             .then(res=>{
                 setComments(res.data)
             })
@@ -94,7 +94,7 @@ function Post(props) {
 
     useEffect(()=>{
         if(props.contentType !== 'shared') {
-            Axios.post('/api/getlikes',{id: props.id})
+            Axios.post('/api/posts/getlikes',{id: props.id})
             .then(res=>{
                 setLikes(res.data)
                 setLiked(null)
@@ -136,7 +136,7 @@ function Post(props) {
             })
     
     
-            Axios.post('/api/getshares',{id: props.id})
+            Axios.post('/api/posts/getshares',{id: props.id})
             .then(res=>{
                 setShares(res.data.shares)
             })

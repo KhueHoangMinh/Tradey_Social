@@ -16,7 +16,7 @@ function Market() {
   var prevPage = 1
 
   useEffect(()=>{
-    Axios.get('/api/getmarket')
+    Axios.get('/api/market/getmarket')
     .then(res=>{
       setMarketItemList(res.data)
       setLoading(1)
@@ -36,7 +36,7 @@ function Market() {
     e.preventDefault()
 
     setLoading(0)
-    Axios.post('/api/search', {input: searchInput, filter: 'date_down'})
+    Axios.post('/api/market/search', {input: searchInput, filter: 'date_down'})
     .then(res=>{
       setMarketPage(1)
       setMarketItemList(res.data)
@@ -138,7 +138,7 @@ const [filter,setFilter] = useState()
 
 useEffect(()=>{
   setLoading(0)
-  Axios.post('/api/search', {input: searchInput, filter: filter})
+  Axios.post('/api/market/search', {input: searchInput, filter: filter})
   .then(res=>{
     setMarketPage(1)
     setMarketItemList(res.data)

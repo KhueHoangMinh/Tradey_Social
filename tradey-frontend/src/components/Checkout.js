@@ -22,7 +22,7 @@ function Checkout() {
 
 
     useEffect(()=>{
-        Axios.post('/api/getcart',{userId: user.user_id})
+        Axios.post('/api/users/getcart',{userId: user.user_id})
         .then(res=>{
             if(res.data.length > 0) {
                 setCart(res.data)
@@ -73,7 +73,7 @@ function Checkout() {
       const handleCheckout = async  (e) => {
         e.preventDefault()
 
-        Axios.post('/api/checkout', {
+        Axios.post('/api/users/checkout', {
           userId: user.user_id,
           phone: phone,
           address: address,

@@ -30,7 +30,7 @@ function Shop(props) {
     data.append('image', image)
     data.append('type', 'market')
 
-    Axios.post('/api/postproduct', data, {
+    Axios.post('/api/market/postproduct', data, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -43,7 +43,7 @@ function Shop(props) {
 
 
   useEffect(()=>{
-    Axios.post('/api/getproductbysellerid', {userId: props.user.user_id})
+    Axios.post('/api/market/getproductbysellerid', {userId: props.user.user_id})
     .then(res=> {
       setMarketProducts(res.data)
       setLoading(1)

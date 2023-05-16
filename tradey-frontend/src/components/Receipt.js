@@ -14,7 +14,7 @@ function Receipt(props) {
     const navigate = useNavigate()
 
     useEffect(()=>{
-        Axios.post('/api/getbillbybillid',{billId: state.billId})
+        Axios.post('/api/users/getbillbybillid',{billId: state.billId})
         .then(res=>{
             setBill(res.data[0])
             setLoading(1)

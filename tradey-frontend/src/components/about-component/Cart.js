@@ -21,7 +21,7 @@ function Cart() {
   }
 
   useEffect(()=>{
-    Axios.post('/api/getcart',{userId: user.user_id})
+    Axios.post('/api/users/getcart',{userId: user.user_id})
     .then(res=>{
       setMarketCart(res.data)
       setLoading(1)

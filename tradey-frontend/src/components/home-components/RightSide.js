@@ -14,7 +14,7 @@ function RightSide() {
   const user = useSelector(state => state.auth.user)
   const [showingAd, setShowingAd] = useState(0)
   useEffect(()=>{
-    Axios.post('/api/getadvertisement')
+    Axios.post('/api/posts/getadvertisement')
     .then(res=> {
       setAdvertisement(res.data)
       setLoading(1)
@@ -23,7 +23,7 @@ function RightSide() {
 
   useEffect(()=>{
     if(user) {
-      Axios.post('/api/getfriends', {userId: user.user_id})
+      Axios.post('/api/users/getfriends', {userId: user.user_id})
       .then(res=>{
         setUsers(res.data)
         setLoading1(1)

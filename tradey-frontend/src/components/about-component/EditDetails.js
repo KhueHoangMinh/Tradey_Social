@@ -17,7 +17,7 @@ function EditDetails(props) {
         switch(content) {
             case 'avatar':
                 setLoading('avatar')
-                Axios.post('/api/updateuserinfo', {userId: props.user.user_id, avatar: avatar},{
+                Axios.post('/api/users/updateuserinfo', {userId: props.user.user_id, avatar: avatar},{
                     headers: {
                       "Content-Type": "multipart/form-data"
                     }
@@ -27,13 +27,13 @@ function EditDetails(props) {
                 
             case 'username':
                 setLoading('username')
-                Axios.post('/api/updateuserinfo', {userId: props.user.user_id, username: username})
+                Axios.post('/api/users/updateuserinfo', {userId: props.user.user_id, username: username})
                 .then(res => setLoading(''))
                 break
                 
             case 'password':
                 setLoading('password')
-                Axios.post('/api/updateuserinfo', {userId: props.user.user_id, password: password})
+                Axios.post('/api/users/updateuserinfo', {userId: props.user.user_id, password: password})
                 .then(res => setLoading(''))
                 break
         }

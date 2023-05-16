@@ -23,7 +23,7 @@ function Register() {
     const [errors, setErrors] = useState()
 
     const handleRegister = () => {
-        Axios.post('/api/register', {type: "user", name: username, email: email, photoURL: photoURL, password: password})
+        Axios.post('/api/users/register', {type: "user", name: username, email: email, photoURL: photoURL, password: password})
         .then(res=>{
             if(res.data === 'existed') {
                 setErrors('existed')
@@ -35,7 +35,7 @@ function Register() {
 
   const handleGoogleRegister = () => {
     signInWithPopup(auth,provider).then((result)=>{
-        Axios.post('/api/register', {type: "googleuser", name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL, password: 'google'})
+        Axios.post('/api/users/register', {type: "googleuser", name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL, password: 'google'})
         .then(res=>{
             if(res.data === 'existed') {
                 setErrors('existed')

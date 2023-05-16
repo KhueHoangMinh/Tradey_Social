@@ -45,7 +45,7 @@ function LeftSide(props) {
   const date = new Date()
 
   useEffect(()=>{
-    Axios.post('/api/gethighlighted')
+    Axios.post('/api/market/gethighlighted')
     .then(res=>{
       setHighlighted(res.data[0])
       setHighlightedList(res.data.slice(1,res.data.length-1))
@@ -55,7 +55,7 @@ function LeftSide(props) {
   const postArticle = (e)=>{
     e.preventDefault()
     setPostLoading(0)
-    Axios.post('/api/post', {
+    Axios.post('/api/posts/post', {
       publisherId: user.user_id,
       description: postText,
       image: image,
@@ -77,7 +77,7 @@ function LeftSide(props) {
   const handleSearch = (e) => {
     e.preventDefault()
     setSearchLoading(0)
-    Axios.post('/api/searchuser', {name: searchInput})
+    Axios.post('/api/users/searchuser', {name: searchInput})
     .then(res=> {
       setSearchResult(res.data)
       setSearchLoading(1)

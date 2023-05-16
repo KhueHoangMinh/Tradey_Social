@@ -8,11 +8,11 @@ function ChatBox(props) {
     const [messages,setMessages] = useState([])
 
     useEffect(()=>{
-        Axios.post('/api/getuserbyid', {userId: props.chatting})
+        Axios.post('/api/users/getuserbyid', {userId: props.chatting})
         .then(res=>{
             setOther(res.data[0])
         })
-        Axios.post('/api/getmessages', {userId: props.userId, chatting: props.chatting})
+        Axios.post('/api/users/getmessages', {userId: props.userId, chatting: props.chatting})
         .then(res => {
             var processMessages = []
             for(var i = 0; i< res.data.length; i++) {

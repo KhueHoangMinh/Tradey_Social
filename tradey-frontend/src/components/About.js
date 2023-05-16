@@ -43,11 +43,11 @@ function About() {
           navigate('/')
         }
         if(state && currentUser && state.userId && state.userId != currentUser.user_id) {
-            Axios.post('/api/getuserbyid', {userId: state.userId})
+            Axios.post('/api/users/getuserbyid', {userId: state.userId})
             .then(res=> {
                 setUser({user_id: res.data[0].user_id, type: res.data[0].type, displayName: res.data[0].name, email: res.data[0].email, photoURL: res.data[0].photourl})
             })
-            Axios.post('/api/checkrelationship',{userId: currentUser.user_id, friendId: state.userId})
+            Axios.post('/api/users/checkrelationship',{userId: currentUser.user_id, friendId: state.userId})
             .then(res=>{
                 switch(res.data) {
                     case 'friend':
@@ -105,9 +105,9 @@ function About() {
 
     const handleAddFriend = () => {
         if(state && currentUser && state.userId && state.userId != currentUser.user_id) {
-            Axios.post('/api/addfriend',{userId: currentUser.user_id, friendId: state.userId})
+            Axios.post('/api/users/addfriend',{userId: currentUser.user_id, friendId: state.userId})
             .then(res=>{
-                Axios.post('/api/checkrelationship',{userId: currentUser.user_id, friendId: state.userId})
+                Axios.post('/api/users/checkrelationship',{userId: currentUser.user_id, friendId: state.userId})
                 .then(res=>{
                     switch(res.data) {
                         case 'friend':

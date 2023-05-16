@@ -29,7 +29,7 @@ function Item(props) {
   }
 
   const handleDelete = () => {
-    Axios.post('/api/deleteproduct',{productId: props.productId})
+    Axios.post('/api/market/deleteproduct',{productId: props.productId})
     .then(res=>{
       if(props.setReload) props.setReload(!props.reload)
     })
@@ -50,7 +50,7 @@ function Item(props) {
     for(let i = lastSlash + 1; i < props.productImage.length; i++) {
       imageName = imageName + props.productImage[i]
     }
-    Axios.post('/api/updateproduct',{
+    Axios.post('/api/market/updateproduct',{
       productId: props.productId,
       name: name,
       description: description,
@@ -65,7 +65,7 @@ function Item(props) {
   }
 
   const changeQuant = (action) => {
-    Axios.post('/api/changecartquant', {userId: props.userId, productId: props.productId, action: action})
+    Axios.post('/api/users/changecartquant', {userId: props.userId, productId: props.productId, action: action})
     .then(res=> {
       if(quantity != parseInt(res.data.quantity) && res.data.quantity > 0) {
         setQuantity(parseInt(res.data.quantity))

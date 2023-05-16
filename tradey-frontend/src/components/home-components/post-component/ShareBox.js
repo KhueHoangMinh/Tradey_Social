@@ -10,7 +10,7 @@ function ShareBox(props) {
     const postShare = (e) => {
         e.preventDefault()
         setLoading(0)
-        Axios.post('/api/post',{source: props.postId, description: shareDescription, publisherId: props.userId, type: props.type})
+        Axios.post('/api/posts/post',{source: props.postId, description: shareDescription, publisherId: props.userId, type: props.type})
         .then(()=>{
             setLoading(1)
             if(props.closePopUp) props.closePopUp()

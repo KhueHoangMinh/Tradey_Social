@@ -24,7 +24,7 @@ function Login() {
 
     const handleLogin = (e) => {
         e.preventDefault()
-        Axios.post('/api/login', {email: username, password: password})
+        Axios.post('/api/users/login', {email: username, password: password})
         .then(res=>{
             if(res.data.rows.length === 1) {
                 const userData = {user_id: res.data.rows[0].user_id, type: res.data.rows[0].type, displayName: res.data.rows[0].name, email: res.data.rows[0].email, photoURL: res.data.rows[0].photourl}
@@ -38,7 +38,7 @@ function Login() {
 
   const handleGoogleLogin = () => {
     signInWithPopup(auth,provider).then((result)=>{
-        Axios.post('/api/googlelogin', {email: result.user.email})
+        Axios.post('/api/users/googlelogin', {email: result.user.email})
         .then(res=>{
             if(res.data.rows.length === 1) {
                 const userData = {user_id: res.data.rows[0].user_id, type: res.data.rows[0].type, displayName: res.data.rows[0].name, email: res.data.rows[0].email, photoURL: res.data.rows[0].photourl}
