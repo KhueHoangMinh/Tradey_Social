@@ -118,7 +118,7 @@ function Item(props) {
               }
             </div>
             }
-          </div>
+          </div> 
         </div>
         {
           openDelete &&
