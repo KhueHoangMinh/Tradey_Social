@@ -1,0 +1,1 @@
+{"version":3,"file":"static/css/main.eba1ca7a.css","mappings":"AAAA,KAEI,sBAAuB,CADvB,QAAS,CAET,sBACJ","sources":["index.css"],"sourcesContent":["body {\r\n    margin: 0;\r\n    font-family: sans-serif;\r\n    scroll-behavior: smooth;\r\n}"],"names":[],"sourceRoot":""}

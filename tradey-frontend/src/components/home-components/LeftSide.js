@@ -45,7 +45,7 @@ function LeftSide(props) {
   const date = new Date()
 
   useEffect(()=>{
-    Axios.post('/api/market/gethighlighted')
+    Axios.post('api/market/gethighlighted')
     .then(res=>{
       setHighlighted(res.data[0])
       setHighlightedList(res.data.slice(1,res.data.length-1))
@@ -55,7 +55,7 @@ function LeftSide(props) {
   const postArticle = (e)=>{
     e.preventDefault()
     setPostLoading(0)
-    Axios.post('/api/posts/post', {
+    Axios.post('api/posts/post', {
       publisherId: user.user_id,
       description: postText,
       image: image,
@@ -77,7 +77,7 @@ function LeftSide(props) {
   const handleSearch = (e) => {
     e.preventDefault()
     setSearchLoading(0)
-    Axios.post('/api/users/searchuser', {name: searchInput})
+    Axios.post('api/users/searchuser', {name: searchInput})
     .then(res=> {
       setSearchResult(res.data)
       setSearchLoading(1)
@@ -162,8 +162,8 @@ function LeftSide(props) {
           </User>
         ))): <Loading></Loading>
       }
-      <h2>Highlighted Products</h2>
       <Highlighted>
+        <h2>Highlighted Products</h2>
           {
             highlighted && 
             <HighlightedItem
@@ -274,11 +274,12 @@ img {
 `
 
 const LeftSideStyle = styled.div`
-overflow: visible;
-overflow-y: scroll;
-height: calc(100vh - 120px);
-width: calc(100% - 20px);
 padding: 0 10px;
+width: calc(100% - 20px);
+height: fit-content;
+max-height: calc(100%);
+overflow-y: scroll;
+position: relative;
 ::-webkit-scrollbar {
   display: none;
 }
@@ -312,7 +313,8 @@ padding: 0 10px;
   }
 }
 @media (max-width: 1200px) {
-  padding: 0;
+  padding: 0px;
+  width: calc(100% - 0px);
   overflow: unset;
   height: fit-content;
 }
@@ -462,7 +464,6 @@ label {
 }
 @media (max-width: 1200px) {
   position: relative;
-  width: calc(100% - 60px);
 }
 `
 

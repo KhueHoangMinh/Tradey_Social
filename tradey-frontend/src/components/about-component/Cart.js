@@ -21,7 +21,7 @@ function Cart() {
   }
 
   useEffect(()=>{
-    Axios.post('/api/users/getcart',{userId: user.user_id})
+    Axios.post('api/users/getcart',{userId: user.user_id})
     .then(res=>{
       setMarketCart(res.data)
       setLoading(1)
@@ -34,7 +34,7 @@ function Cart() {
       sum += marketCart[i].price * marketCart[i].quantity 
     }
     setTotal(sum)
-  },[marketCart])
+  },[marketCart,change])
 
   return (
     <div>

@@ -8,7 +8,7 @@ import ItemPanel from './Item'
 function SingleAdminRequest(props) {
     const [user,setUser] = useState()
     useEffect(()=>{
-        Axios.post('/api/users/getuserbyid',{userId: props.order.user_id})
+        Axios.post('api/users/getuserbyid',{userId: props.order.user_id})
         .then(res=>{
             setUser(res.data[0])
         })
@@ -50,7 +50,7 @@ function AdminRequest(props) {
     const [loading,setLoading] = useState(0)
     const user = useSelector(state=>state.auth.user)
     useEffect(()=>{
-        Axios.post('/api/users/getrequests', {userId: user.user_id})
+        Axios.post('api/users/getrequests', {userId: user.user_id})
         .then(res=>{
           setOrders(res.data)
           setLoading(1)

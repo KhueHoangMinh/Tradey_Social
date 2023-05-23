@@ -24,7 +24,7 @@ function Login() {
 
     const handleLogin = (e) => {
         e.preventDefault()
-        Axios.post('/api/users/login', {email: username, password: password})
+        Axios.post('api/users/login', {email: username, password: password})
         .then(res=>{
             if(res.data.rows.length === 1) {
                 const userData = {user_id: res.data.rows[0].user_id, type: res.data.rows[0].type, displayName: res.data.rows[0].name, email: res.data.rows[0].email, photoURL: res.data.rows[0].photourl}
@@ -38,7 +38,7 @@ function Login() {
 
   const handleGoogleLogin = () => {
     signInWithPopup(auth,provider).then((result)=>{
-        Axios.post('/api/users/googlelogin', {email: result.user.email})
+        Axios.post('api/users/googlelogin', {email: result.user.email})
         .then(res=>{
             if(res.data.rows.length === 1) {
                 const userData = {user_id: res.data.rows[0].user_id, type: res.data.rows[0].type, displayName: res.data.rows[0].name, email: res.data.rows[0].email, photoURL: res.data.rows[0].photourl}
@@ -146,16 +146,17 @@ justify-content: center;
 background-color: rgb(30, 30, 30);
 height: 100vh;
 width: 100vw;
+position: relative;
+/* overflow: hidden; */
 margin: 0;
 padding: 0;
 .login-bg {
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     position: absolute;
-    height: fit-content;
-    width: fit-content;
     background-color: rgb(30, 30, 30);
     color: rgba(255,255,255,0.02);
+    overflow: hidden;
     left: 0;
     z-index: 0;
     user-select: none;

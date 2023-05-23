@@ -168,12 +168,11 @@ router.post('/deleteproduct', async (req,res) => {
     const selectQuery = `SELECT * FROM tradey_ks.products_by_product_id WHERE product_id = ?;`
     const selectRs = await client.execute(selectQuery,[productId])
 
-    const query = `BEGIN BATCH
-    DELETE FROM tradey_ks.products_by_product_id WHERE product_id = ${selectRs.rows[0].product_id.toString()};
-    DELETE FROM tradey_ks.products_by_seller_id WHERE seller_id = ${selectRs.rows[0].seller_id.toString()} AND product_id = ${selectRs.rows[0].product_id.toString()};
-    APPLY BATCH;`
-
     if(selectRs.rows.length > 0) {
+        const query = `BEGIN BATCH
+        DELETE FROM tradey_ks.products_by_product_id WHERE product_id = ${selectRs.rows[0].product_id.toString()};
+        DELETE FROM tradey_ks.products_by_seller_id WHERE seller_id = ${selectRs.rows[0].seller_id.toString()} AND product_id = ${selectRs.rows[0].product_id.toString()};
+        APPLY BATCH;`
         await client.execute(query)
         res.send('deleted')
     } else {
@@ -209,14 +208,12 @@ router.post('/updateproduct', updateMarketUpload.single('image'), async (req,res
     
     const selectQuery = `SELECT * FROM tradey_ks.products_by_product_id WHERE product_id = ?;`
     const selectRs = await client.execute(selectQuery,[productId])
-
-    const query = `BEGIN BATCH
-    UPDATE tradey_ks.products_by_product_id SET product_name = '${name}', description = '${description}', price = ${price.toString()}, image = '${image}' WHERE type = 'market' AND product_id = ${selectRs.rows[0].product_id.toString()};
-    UPDATE tradey_ks.products_by_seller_id SET product_name = '${name}', description = '${description}', price = ${price.toString()}, image = '${image}' WHERE type = 'market' AND seller_id = ${selectRs.rows[0].seller_id.toString()} AND time =  ${selectRs.rows[0].time.toString()} AND product_id = ${selectRs.rows[0].product_id.toString()};
-    APPLY BATCH;`
-
     
     if(selectRs.rows.length > 0) {
+        const query = `BEGIN BATCH
+        UPDATE tradey_ks.products_by_product_id SET product_name = '${name ? name : selectRs.rows[0].name}', description = '${description? description : selectRs.rows[0].description}', price = ${price ? price.toString() : selectRs.rows[0].price.toString()}, image = '${image ? image : selectRs.rows[0].image}' WHERE product_id = ${selectRs.rows[0].product_id.toString()};
+        UPDATE tradey_ks.products_by_seller_id SET product_name = '${name ? name : selectRs.rows[0].name}', description = '${description? description : selectRs.rows[0].description}', price = ${price ? price.toString() : selectRs.rows[0].price.toString()}, image = '${image ? image : selectRs.rows[0].image}' WHERE seller_id = ${selectRs.rows[0].seller_id.toString()} AND product_id = ${selectRs.rows[0].product_id.toString()};
+        APPLY BATCH;`
         await client.execute(query)
         res.send('updated')
     } else {
@@ -232,13 +229,16 @@ router.post('/getproductbyid', async (req,res) => {
 
     const rs = await client.execute(query,[productId])
     var additional = {}
-    if(req.body.addPublisher) {
-        const userQuery = `SELECT user_id,name,email,photourl,type FROM tradey_ks.users_by_user_id WHERE user_id = ?;`
-        const userRs = await client.execute(userQuery,[rs.rows[0].seller_id])
-        additional = userRs.rows[0]
+    if(rs.rows.length) {
+        if(req.body.addPublisher) {
+            const userQuery = `SELECT user_id,name,email,photourl,type FROM tradey_ks.users_by_user_id WHERE user_id = ?;`
+            const userRs = await client.execute(userQuery,[rs.rows[0].seller_id])
+            additional = userRs.rows[0]
+        }
+        res.send([{...rs.rows[0],...additional}])
+    } else {
+        res.send("not_found")
     }
-
-    res.send([{...rs.rows[0],...additional}])
 })
 
 // API to get highlighted products
@@ -258,17 +258,14 @@ router.post('/gethighlighted', async (req,res) => {
             }
         }
         if(check) {
-            finalRs.push({...rs.rows[i]})
+            var selectQuery = `SELECT * FROM tradey_ks.products_by_product_id WHERE product_id = ?;`
+            var selectRs = await client.execute(selectQuery, [rs.rows[i].product_id])
+            if(selectRs.rows.length > 0) finalRs.push({...rs.rows[i],...selectRs.rows[0]})
         }
     }
 
     finalRs.sort((a, b) => (a.quantity > b.quantity) ? -1 : 1)
 
-    for(var i = 0; i < finalRs.length; i++) {
-        var selectQuery = `SELECT * FROM tradey_ks.products_by_product_id WHERE product_id = ?;`
-        var selectRs = await client.execute(selectQuery, [finalRs[i].product_id])
-        if(selectRs.rows.length > 0) finalRs[i] = {...finalRs[i],...selectRs.rows[0]}
-    }
 
     res.send(finalRs)
 })

@@ -12,7 +12,7 @@ function Main(props) {
   const [showingShareInput, setShowingShareInput] = useState()
   const user = useSelector(state=>state.auth.user)
   useEffect(()=>{
-    Axios.get('/api/posts/getposts')
+    Axios.get('api/posts/getposts')
     .then(res=>{
       setPosts(res.data)
       setLoading(1)
@@ -108,10 +108,12 @@ function Main(props) {
 }
 
 const MainStyle = styled.div`
-position: relative;
-overflow: auto;
 padding: 0 10px;
 width: calc(100% - 20px);
+height: fit-content;
+overflow-y: scroll;
+position: relative;
+align-items: center;
 ::-webkit-scrollbar {
   display: none;
 }

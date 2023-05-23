@@ -6,13 +6,11 @@ background-color: transparent;
 display: flex;
 flex-direction: column;
 position: sticky;
-top: 100px;
-left: 10px;
 width: 100%;
 height: calc(100vh - 180px);
 @media (max-width: 1200px) {
   position: relative;
-  width: calc(100% - 20px);
+  height: fit-content;
 }
 `
 

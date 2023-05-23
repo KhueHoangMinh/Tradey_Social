@@ -57,6 +57,12 @@ h2 {
   grid-template-columns: repeat(3,1fr);
   gap: 20px;
 }
+@media (max-width: 1200px) {
+  .item-list {
+      display: flex;
+      flex-direction: column;
+  }
+}
 `
 
 export default Main

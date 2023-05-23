@@ -58,7 +58,7 @@ function History() {
   const [loading,setLoading] = useState(0)
 
   useEffect(()=>{
-    Axios.post('/api/users/getbillsbyuser',{userId: user.user_id})
+    Axios.post('api/users/getbillsbyuser',{userId: user.user_id})
     .then(res=> {
       setBills(res.data)
       setLoading(1)

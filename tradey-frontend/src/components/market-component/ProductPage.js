@@ -33,13 +33,13 @@ function ProductPage(props) {
   const [showingShareInput, setShowingShareInput] = useState()
 
   useEffect(()=>{
-    Axios.post('/api/market/getproductbyid', {productId: state.productId})
+    Axios.post('api/market/getproductbyid', {productId: state.productId})
     .then(res=>{
       setProduct(res.data[0])
       setLoading(1)
-      Axios.post('/api/users/getuserbyid', {userId: res.data[0].seller_id})
+      Axios.post('api/users/getuserbyid', {userId: res.data[0].seller_id})
       .then(res1 => {
-        Axios.post('/api/market/getproductbysellerid', {userId: res.data[0].seller_id})
+        Axios.post('api/market/getproductbysellerid', {userId: res.data[0].seller_id})
         .then(res2=> {
           setSeller(res1.data[0])
           setProductsfromShop(res2.data.slice(0,10))
@@ -51,14 +51,14 @@ function ProductPage(props) {
 
   const handleAdd = () => {
     if(quantity > 0) {
-      Axios.post('/api/users/addtocart', {userId: user.user_id, productId: state.productId, quantity: quantity, action: 'add'})
+      Axios.post('api/users/addtocart', {userId: user.user_id, productId: state.productId, quantity: quantity, action: 'add'})
       .then(res => {
       })
     }
   }
 
   const handleLike = (type) => {
-    Axios.post('/api/posts/like',{postId: state.productId, userId: user.user_id, type: type})
+    Axios.post('api/posts/like',{postId: state.productId, userId: user.user_id, type: type})
     .then(()=>{
         setChange(!change)
     })
@@ -89,14 +89,14 @@ const handleShare = () => {
 }
 
 useEffect(()=>{
-    Axios.post('/api/posts/getcomments',{id: state.productId})
+    Axios.post('api/posts/getcomments',{id: state.productId})
     .then(res=>{
         setComments(res.data)
     })
-},[cmtChange])
+},[cmtChange,state])
 
 useEffect(()=>{
-      Axios.post('/api/posts/getlikes',{id: state.productId})
+      Axios.post('api/posts/getlikes',{id: state.productId})
       .then(res=>{
           setLikes(res.data)
           setLiked(null)
@@ -138,9 +138,9 @@ useEffect(()=>{
       })
 
 
-      Axios.post('/api/posts/getshares',{id: state.productId})
+      Axios.post('api/posts/getshares',{id: state.productId})
       .then(res=>setShares(res.data.shares))
-},[change])
+},[change,state])
 
 const viewUserPage = (userId) => {
   navigate('/about',{state: {

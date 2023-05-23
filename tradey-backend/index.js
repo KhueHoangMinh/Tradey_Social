@@ -7,6 +7,7 @@ const http = require('http')
 const bodyParser = require('body-parser')
 const multer = require('multer')
 const path = require('path')
+const favicon = require("serve-favicon")
 const {Client} = require("cassandra-driver")
 const {Server} = require('socket.io')
 
@@ -22,11 +23,10 @@ async function run() {
     app.use(bodyParser.json({limit: '1mb'}))
     app.use(express.json())
     app.use(cors({
-        origin: [FRONTEND + ":3000","http://localhost:3000"],
+        origin: [FRONTEND + ":3001","http://localhost:3000"],
         credentials: true
     }))
 
-    app.use('/storage',express.static('storage'))
 
     // Connect to AstraDB
 
@@ -49,7 +49,7 @@ async function run() {
 
     const io = new Server(server, {
         cors: {
-            origin: [FRONTEND + ":3000","http://localhost:3000"],
+            origin: [FRONTEND + ":3001","http://localhost:3000"],
             methods: ["GET","POST"],
             credentials: true
         }
@@ -100,7 +100,9 @@ async function run() {
         })
     })
 
-    server.listen(3002)
+    // app.use(favicon(path.join(__dirname,"images","png","crop-logo-no-background.png")))
+    app.use('/storage',express.static('storage'))
+    app.use('',express.static('build'))
 
 
     // Routes for APIs
@@ -111,9 +113,10 @@ async function run() {
     app.use("/api/users", usersRoute)
     app.use("/api/posts", postsRoute)
     app.use("/api/market", marketRoute)
+    app.use('*',express.static('build'))
 
     // Run server on port 3001
-    app.listen(3001)
+    server.listen(3001)
 
     
 }

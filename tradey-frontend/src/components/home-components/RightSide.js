@@ -14,7 +14,7 @@ function RightSide() {
   const user = useSelector(state => state.auth.user)
   const [showingAd, setShowingAd] = useState(0)
   useEffect(()=>{
-    Axios.post('/api/posts/getadvertisement')
+    Axios.post('api/posts/getadvertisement')
     .then(res=> {
       setAdvertisement(res.data)
       setLoading(1)
@@ -23,7 +23,7 @@ function RightSide() {
 
   useEffect(()=>{
     if(user) {
-      Axios.post('/api/users/getfriends', {userId: user.user_id})
+      Axios.post('api/users/getfriends', {userId: user.user_id})
       .then(res=>{
         setUsers(res.data)
         setLoading1(1)
@@ -228,6 +228,10 @@ position: relative;
   width: fit-content;
   background-color: transparent;
 }
+@media (max-width: 1200px) {
+  padding: 0px;
+  width: calc(100% - 0px);
+}
 `
 
 const Panel = styled.div`
@@ -288,10 +292,6 @@ margin-bottom: 20px;
       -webkit-box-orient: vertical;
     }
   }
-
-}
-@media (max-width: 1200px) {
-  display: none;
 }
 `
 

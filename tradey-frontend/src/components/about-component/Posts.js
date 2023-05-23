@@ -9,7 +9,7 @@ function Posts(props) {
   const [showingCommentInput, setShowingCommentInput] = useState()
   const [showingShareInput, setShowingShareInput] = useState()
   useEffect(()=>{
-    Axios.post('/api/market/getuserposts', {userId: props.user.user_id})
+    Axios.post('api/market/getuserposts', {userId: props.user.user_id})
     .then(res=>{
       setPosts(res.data)
       setLoading(1)

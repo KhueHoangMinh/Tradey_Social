@@ -17,13 +17,13 @@ function Comment(props) {
 
     useEffect(()=>{
         if(props.comment.comment_id !== commentId) {
-            Axios.post('/api/posts/getcommentbycommentid',{commentId: props.comment.comment_id})
+            Axios.post('api/posts/getcommentbycommentid',{commentId: props.comment.comment_id})
             .then(res=>setCmtContent(res.data[0]))
         }
     },[props.comment.comment_id])
     
     useEffect(()=>{
-        Axios.post('/api/posts/getlikes',{id: props.comment.comment_id})
+        Axios.post('api/posts/getlikes',{id: props.comment.comment_id})
         .then(res=>{
             setCmtLikes(res.data)
             setCmtLiked(null)
@@ -67,7 +67,7 @@ function Comment(props) {
     },[change, cmtContent])
 
     const handleCmtLike = (type) => {
-        Axios.post('/api/posts/like',{postId: props.comment.comment_id, userId: props.userId, type: type})
+        Axios.post('api/posts/like',{postId: props.comment.comment_id, userId: props.userId, type: type})
         .then(()=>{
             setChange(!change)
         })
@@ -119,7 +119,7 @@ function Comment(props) {
                             {showCmtComments && 
                             <Comments
                                 postId = {props.comment.comment_id}
-                                userId = {cmtContent.user_id}
+                                userId = {props.userId}
                                 comments = {props.comment.comments}
                                 change = {props.change}
                                 setChange = {props.setChange}

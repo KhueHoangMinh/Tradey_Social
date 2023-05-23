@@ -17,26 +17,36 @@ function EditDetails(props) {
         switch(content) {
             case 'avatar':
                 setLoading('avatar')
-                Axios.post('/api/users/updateuserinfo', {userId: props.user.user_id, avatar: avatar},{
+                Axios.post('api/users/updateuserinfo', {userId: props.user.user_id, avatar: avatar},{
                     headers: {
                       "Content-Type": "multipart/form-data"
                     }
                   })
-                  .then(res => setLoading(''))
+                  .then(res => {
+                    setLoading('')
+                    setEditting('')
+                    })
                 break
                 
             case 'username':
                 setLoading('username')
-                Axios.post('/api/users/updateuserinfo', {userId: props.user.user_id, username: username})
-                .then(res => setLoading(''))
+                Axios.post('api/users/updateuserinfo', {userId: props.user.user_id, username: username})
+                .then(res => {
+                    setLoading('')
+                    setEditting('')
+                    })
                 break
                 
             case 'password':
                 setLoading('password')
-                Axios.post('/api/users/updateuserinfo', {userId: props.user.user_id, password: password})
-                .then(res => setLoading(''))
+                Axios.post('api/users/updateuserinfo', {userId: props.user.user_id, password: password})
+                .then(res => {
+                    setLoading('')
+                    setEditting('')
+                    })
                 break
         }
+
     }
   return (
     <div>
@@ -67,19 +77,6 @@ function EditDetails(props) {
             (<><a className='edit-btn' onClick={()=>{setEditting('')}}>Cancel</a><a type='submit' className='edit-btn' onClick={(e)=>{handleSave(e, 'username')}}>Save</a></>)}
             </div>
         </form>
-        {
-            props.user.type !== 'googleuser' &&
-            <form className='info'>
-                <div className='editable'>
-                    <label>Password:</label>
-                    {editting === 'password'?(<input type='text' onChange={(e)=>{setPassword(e.target.value)}}/>):(<span>hidden</span>)}
-                </div>
-                <div className='btn-box'>
-                {editting !== 'password'?(<a className='edit-btn' onClick={()=>{setEditting('password')}}>Edit</a>):
-                (<><a className='edit-btn' onClick={()=>{setEditting('')}}>Cancel</a><a type='submit' className='edit-btn' onClick={(e)=>{handleSave(e, 'password')}}>Save</a></>)}
-                </div>
-            </form>
-        }
       </DetailsTab>
     </div>
   )
@@ -152,6 +149,12 @@ h2 {
 }
 .avatar.info {
     height: fit-content;
+}
+@media (max-width: 1200px) {
+    .avatar .editable {
+        display: flex;
+        flex-direction: column;
+    }
 }
 `
 

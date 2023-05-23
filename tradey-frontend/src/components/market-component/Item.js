@@ -65,6 +65,7 @@ color: white;
     position: relative;
     width: 100%;
     overflow: hidden;
+    z-index: 0;
     &::after {
       padding-top: 60%;
       display: block;

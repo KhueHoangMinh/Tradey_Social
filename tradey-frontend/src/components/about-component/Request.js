@@ -10,7 +10,7 @@ function Itemmmm(props) {
   const [product,setProduct] = useState()
 
   useEffect(()=>{
-    Axios.post('/api/market/getproductbyid', {type: 'market',productId: props.productId})
+    Axios.post('api/market/getproductbyid', {type: 'market',productId: props.productId})
     .then(res => {
       setProduct(res.data[0])
     })
@@ -89,7 +89,7 @@ function SingleRequest(props) {
   }
 
   useEffect(()=>{
-      Axios.post('/api/users/getuserbyid',{userId: props.order.user_id})
+      Axios.post('api/users/getuserbyid',{userId: props.order.user_id})
       .then(res=>{
           setUser(res.data[0])
       })
@@ -98,7 +98,7 @@ function SingleRequest(props) {
   },[])
 
   const changeStatus = (status) => {
-    Axios.post("/api/users/changeorderstatus", {orderId: props.order.bill_id, userId: props.order.user_id, status: status})
+    Axios.post("api/users/changeorderstatus", {orderId: props.order.bill_id, userId: props.order.user_id, status: status})
     .then(res=>{
       if(res.data === "updated") setStatus(status)
       setPopUp(false)
@@ -219,7 +219,7 @@ function Request(props) {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(0)
   useEffect(()=>{
-      Axios.post('/api/users/getrequests',{userId: props.user.user_id})
+      Axios.post('api/users/getrequests',{userId: props.user.user_id})
       .then(res=>{
           setOrders(res.data)
           setLoading(1)

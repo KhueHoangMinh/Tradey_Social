@@ -43,11 +43,11 @@ function About() {
           navigate('/')
         }
         if(state && currentUser && state.userId && state.userId != currentUser.user_id) {
-            Axios.post('/api/users/getuserbyid', {userId: state.userId})
+            Axios.post('api/users/getuserbyid', {userId: state.userId})
             .then(res=> {
                 setUser({user_id: res.data[0].user_id, type: res.data[0].type, displayName: res.data[0].name, email: res.data[0].email, photoURL: res.data[0].photourl})
             })
-            Axios.post('/api/users/checkrelationship',{userId: currentUser.user_id, friendId: state.userId})
+            Axios.post('api/users/checkrelationship',{userId: currentUser.user_id, friendId: state.userId})
             .then(res=>{
                 switch(res.data) {
                     case 'friend':
@@ -105,9 +105,9 @@ function About() {
 
     const handleAddFriend = () => {
         if(state && currentUser && state.userId && state.userId != currentUser.user_id) {
-            Axios.post('/api/users/addfriend',{userId: currentUser.user_id, friendId: state.userId})
+            Axios.post('api/users/addfriend',{userId: currentUser.user_id, friendId: state.userId})
             .then(res=>{
-                Axios.post('/api/users/checkrelationship',{userId: currentUser.user_id, friendId: state.userId})
+                Axios.post('api/users/checkrelationship',{userId: currentUser.user_id, friendId: state.userId})
                 .then(res=>{
                     switch(res.data) {
                         case 'friend':
@@ -146,19 +146,14 @@ function About() {
         <Tabs>
             <div className='buttons'>
                 <a className={active == 'posts' ? 'active': ''} onClick={()=>{setActive('posts')}}>Posts</a>
-                {user ? (user.type !== 'admin' && <a className={active == 'shop' ? 'active': ''} onClick={()=>{setActive('shop')}}>Shop</a>):""}
-                {user ? (user.type === 'admin' && <a className={active == 'adminShop' ? 'active': ''} onClick={()=>{setActive('adminshop')}}>Shop</a>):""}
+                {user ? <a className={active == 'shop' ? 'active': ''} onClick={()=>{setActive('shop')}}>Shop</a>:""}
                 {
                     user && currentUser.user_id === user.user_id &&
                     <>
                         <a className={active == 'editDetails' ? 'active': ''} onClick={()=>{setActive('editDetails')}}>Edit details</a>
                         {user ? (user.type === 'admin' && <a className={active == 'advertisement' ? 'active': ''} onClick={()=>{setActive('advertisement')}}>Advertisement</a>):""}
                         <a className={active == 'request' || active == 'adminrequest' ? 'active': ''} onClick={()=>{
-                            if(user.type === 'admin') {
-                                setActive('adminrequest')
-                            } else {
-                                setActive('request')
-                            }
+                            setActive('request')
                         }}>Order requests</a>
                         {user ? (user.type !== 'admin' && <a className={active == 'cart' ? 'active': ''} onClick={()=>{setActive('cart')}}>Your cart</a>):""}
                         {user ? (user.type !== 'admin' && <a className={active == 'history' ? 'active': ''} onClick={()=>{setActive('history')}}>Shopping history</a>):""}
@@ -300,7 +295,8 @@ box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
 }
 @media (max-width: 1200px) {
   position: relative;
-  width: calc(100%);
+  width: 100%;
+  height: fit-content;
 }
 `
 
@@ -317,7 +313,7 @@ overflow-x: hidden;
 }
 @media (max-width: 1200px) {
   position: relative;
-  width: calc(100%);
+  width: calc(100% - 40px);
   overflow-y: visible;
 }
 `

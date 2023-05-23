@@ -8,11 +8,11 @@ function ChatBox(props) {
     const [messages,setMessages] = useState([])
 
     useEffect(()=>{
-        Axios.post('/api/users/getuserbyid', {userId: props.chatting})
+        Axios.post('api/users/getuserbyid', {userId: props.chatting})
         .then(res=>{
             setOther(res.data[0])
         })
-        Axios.post('/api/users/getmessages', {userId: props.userId, chatting: props.chatting})
+        Axios.post('api/users/getmessages', {userId: props.userId, chatting: props.chatting})
         .then(res => {
             var processMessages = []
             for(var i = 0; i< res.data.length; i++) {
@@ -107,6 +107,7 @@ border-radius: 20px;
 overflow: hidden;
 box-shadow: 5px 5px 5px rgba(0,0,0,0.4);
 position: relative;
+z-index: 100;
 .box-head {
     background-color: rgb(50,50,50);
     display: flex;

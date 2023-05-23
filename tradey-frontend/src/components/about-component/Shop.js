@@ -30,7 +30,7 @@ function Shop(props) {
     data.append('image', image)
     data.append('type', 'market')
 
-    Axios.post('/api/market/postproduct', data, {
+    Axios.post('api/market/postproduct', data, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -43,7 +43,7 @@ function Shop(props) {
 
 
   useEffect(()=>{
-    Axios.post('/api/market/getproductbysellerid', {userId: props.user.user_id})
+    Axios.post('api/market/getproductbysellerid', {userId: props.user.user_id})
     .then(res=> {
       setMarketProducts(res.data)
       setLoading(1)
@@ -54,7 +54,7 @@ function Shop(props) {
     <div>
       <ProductsPage>
         <div className='header'>
-          <h2>Your shop</h2>
+          <h2>{currentUser.user_id == props.user.user_id ? 'Your shop' : props.user.displayName + "'s Shop"}</h2>
           {currentUser.user_id == props.user.user_id && <button className='add-btn' onClick={()=>setPopUp(true)}>Add</button>}
         </div>
         <div className='product-list'>

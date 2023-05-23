@@ -67,7 +67,7 @@ function Advertisement() {
   const [description, setDescription] = useState()
   const [image, setImage] = useState()
   const [link, setLink] = useState()
-  const [advertisement,setAdvertisement] = useState([])
+  const [advertisements,setAdvertisements] = useState([])
   const [addPopUp,setAddPopUp] = useState(false)
   const user = useSelector(state=>state.auth.user)
   const date = new Date()
@@ -83,7 +83,7 @@ function Advertisement() {
     data.append('link', link)
 
 
-    Axios.post('/api/posts/postadvertisement', data, {
+    Axios.post('api/posts/postadvertisement', data, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -94,9 +94,10 @@ function Advertisement() {
   }
 
   useEffect(()=>{
-    Axios.post('app/api/posts/getadvertisement', {userId: user.user_id})
+    Axios.post('api/posts/getadvertisement', {userId: user.user_id})
     .then(res=> {
-      setAdvertisement(res.data)
+      console.log(res.data)
+      setAdvertisements(res.data)
     })
   },[])
   return (
@@ -108,7 +109,7 @@ function Advertisement() {
         </div>
         <div className='product-list'>
           {
-            advertisement.map((product)=>(
+            advertisements.map((advertisement)=>(
               <Item
                 type = {1}
                 productId = {advertisement ? advertisement.ad_id:''}
@@ -230,6 +231,9 @@ position: relative;
       color: black;
     }
   }
+}
+.product-list {
+  margin-top: 80px;
 }
 `
 

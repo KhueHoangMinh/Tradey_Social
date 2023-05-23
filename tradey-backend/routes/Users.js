@@ -21,6 +21,10 @@ client.connect();
 
 // API to register new account
 
+router.get('/test',(req,res) => {
+    res.send("ok")
+})
+
 router.post('/register', async (req,res) => {
     const type = req.body.type
     const name = req.body.name
@@ -426,7 +430,7 @@ var userfilename = ''
 
         var finalRs = []
         for(var i = 0; i < rs.rows.length; i++) {
-            if(rs.rows[i].name.toLowerCase().includes(name.toLowerCase())) {
+            if(name && rs.rows[i].name.toLowerCase().includes(name.toLowerCase())) {
                 finalRs.push(rs.rows[i])
             }
         }

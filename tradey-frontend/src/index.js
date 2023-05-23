@@ -7,13 +7,13 @@ import { Provider } from 'react-redux';
 import store from './store'
 import io from 'socket.io-client'
 
-// window.baseHost = 'http://127.0.0.1:5001/tradey-backend/us-central1/'
-window.baseHost = 'http://192.168.1.7'
+// window.baseHost = 'https://tradey-387014.el.r.appspot.com/'
+window.baseHost = 'http://192.168.1.7:3001/'
 
-window.host = window.baseHost + ':3001/'
+window.host = window.baseHost
 
 window.socket = null
-if(!window.socket) window.socket = io.connect(window.baseHost + ':3002/', 
+if(!window.socket) window.socket = io.connect(window.baseHost, 
   {
     // path: "/tradey-backend/us-central1/server/socket.io",
     withCredentials: true,
