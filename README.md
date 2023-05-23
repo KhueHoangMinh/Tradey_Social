@@ -1,4 +1,4 @@
-# Tradey installation guide
+# Tradey installation guide (Leave a star plz :>)
 
 Node version: v18.14.0
 
