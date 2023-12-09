@@ -1,5 +1,5 @@
 # Contributors
-[Luu Tuan Hoang]([https://github.com/user/repo/blob/branch/other_file.md](https://github.com/hwanginhanoi))
+[Luu Tuan Hoang](https://github.com/hwanginhanoi)
 # Tradey installation guide (Leave a star plz :>)
 
 Node version: v18.14.0
