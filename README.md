@@ -1,6 +1,7 @@
 # Contributors
 [Luu Tuan Hoang](https://github.com/hwanginhanoi)
-[Le Tran Bao Kien](https://github.com/kinley1609))
+
+[Le Tran Bao Kien](https://github.com/kinley1609)
 # Tradey installation guide (Leave a star plz :>)
 
 Node version: v18.14.0
